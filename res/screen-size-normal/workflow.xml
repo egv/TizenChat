@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Workflow>
+    <Scene Form="IDF_FORM" Id="TabScene1" Panel="IDC_PANEL1"/>
+    <Scene Form="IDF_FORM" Id="TabScene2" Panel="IDC_PANEL2"/>
+    <Scene Form="IDF_FORM" Id="TabScene3" Panel="IDC_PANEL3"/>
+    <Scene Form="LoginForm" Id="LOGIN_SCENE"/>
+    <Scene Form="GetTokenForm" Id="IDSCN_1"/>
+    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_START" Method="" SourceId="" SourceResourceType="" TargetId="LOGIN_SCENE"/>
+    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_3" Method="OnActionPerformed" SourceId="TabScene1" SourceResourceType="IDF_FORM" TargetId="TabScene3"/>
+    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_1" Method="OnActionPerformed" SourceId="TabScene2" SourceResourceType="IDF_FORM" TargetId="TabScene1"/>
+    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_2" Method="OnActionPerformed" SourceId="TabScene3" SourceResourceType="IDF_FORM" TargetId="TabScene2"/>
+    <SceneTransition AnimationType="left" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_4" Method="OnActionPerformed" SourceId="LOGIN_SCENE" SourceResourceType="LoginForm" TargetId="IDSCN_1"/>
+    <SceneTransition AnimationType="left" DestroyOption="destroy" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_5" Method="OnLoadingCompleted" SourceId="IDSCN_1" SourceResourceType="GetTokenForm" TargetId="TabScene1"/>
+    <!--UI Builder(Workflow Designer) only-->
+    <WorkflowDesigner>
+        <Position Name="TabScene1" X="222" Y="284"/>
+        <Position Name="TabScene2" X="1145" Y="704"/>
+        <Position Name="TabScene3" X="10" Y="380"/>
+        <Position Name="LOGIN_SCENE" X="475" Y="10"/>
+        <Position Name="IDSCN_1" X="883" Y="23"/>
+    </WorkflowDesigner>
+</Workflow>
