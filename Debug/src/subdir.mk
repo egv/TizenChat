@@ -7,6 +7,7 @@ CPP_SRCS += \
 ../src/AppResourceId.cpp \
 ../src/GetTokenFormClass.cpp \
 ../src/LoginFormClass.cpp \
+../src/SettingsPanelClass.cpp \
 ../src/TizenChat.cpp \
 ../src/TizenChatEntry.cpp \
 ../src/TizenChatFormFactory.cpp \
@@ -15,12 +16,14 @@ CPP_SRCS += \
 ../src/TizenChatPanelFactory.cpp \
 ../src/TizenChatTab1.cpp \
 ../src/TizenChatTab2.cpp \
-../src/TizenChatTab3.cpp 
+../src/TizenChatTab3.cpp \
+../src/Utils.cpp 
 
 OBJS += \
 ./src/AppResourceId.o \
 ./src/GetTokenFormClass.o \
 ./src/LoginFormClass.o \
+./src/SettingsPanelClass.o \
 ./src/TizenChat.o \
 ./src/TizenChatEntry.o \
 ./src/TizenChatFormFactory.o \
@@ -29,12 +32,14 @@ OBJS += \
 ./src/TizenChatPanelFactory.o \
 ./src/TizenChatTab1.o \
 ./src/TizenChatTab2.o \
-./src/TizenChatTab3.o 
+./src/TizenChatTab3.o \
+./src/Utils.o 
 
 CPP_DEPS += \
 ./src/AppResourceId.d \
 ./src/GetTokenFormClass.d \
 ./src/LoginFormClass.d \
+./src/SettingsPanelClass.d \
 ./src/TizenChat.d \
 ./src/TizenChatEntry.d \
 ./src/TizenChatFormFactory.d \
@@ -43,7 +48,8 @@ CPP_DEPS += \
 ./src/TizenChatPanelFactory.d \
 ./src/TizenChatTab1.d \
 ./src/TizenChatTab2.d \
-./src/TizenChatTab3.d 
+./src/TizenChatTab3.d \
+./src/Utils.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

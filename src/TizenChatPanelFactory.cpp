@@ -3,6 +3,7 @@
 #include "TizenChatTab2.h"
 #include "TizenChatTab3.h"
 #include "AppResourceId.h"
+#include "SettingsPanelClass.h"
 
 using namespace Tizen::Ui::Scenes;
 
@@ -45,6 +46,13 @@ TizenChatPanelFactory::CreatePanelN(const Tizen::Base::String& panelId, const Ti
 		pSceneManager->AddSceneEventListener(sceneId, *pPanel);
 		pNewPanel = pPanel;
 	}
+	else if (panelId == SettingsPanel)
+	{
+		SettingsPanelClass* pPanel = new SettingsPanelClass();
+		pPanel->Initialize();
+		pNewPanel = pPanel;
+	}
+
 	// TODO:
 	// Add your panel creation code here
 	return pNewPanel;

@@ -482,7 +482,8 @@ src/GetTokenFormClass.d: ../src/GetTokenFormClass.cpp \
   C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiUiConfigurationTypes.h \
   C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiVerticalBoxLayout.h \
   C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffect.h \
-  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h \
+  ../src/Utils.h
 
 C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FBase.h:
 
@@ -1451,3 +1452,5 @@ C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include
 C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffect.h:
 
 C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h:
+
+../src/Utils.h:

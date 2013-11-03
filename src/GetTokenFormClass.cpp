@@ -4,6 +4,8 @@
 #include "AppResourceId.h"
 #include "GetTokenFormClass.h"
 
+#include "Utils.h"
+
 using namespace Tizen::Io;
 using namespace Tizen::Base;
 using namespace Tizen::Ui;
@@ -133,6 +135,8 @@ GetTokenFormClass::OnLoadingCompleted(void)
 					// we have no error here
 					String *token = static_cast<String*>(params.GetValue(String(L"access_token")));
 					String *expire = static_cast<String*>(params.GetValue(String(L"expires_in")));
+
+					Utils::getInstance().setAccessToken(*token);
 
 					AppLogDebug("token is: %S, expire is: %S", token->GetPointer(), expire->GetPointer());
 

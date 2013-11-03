@@ -488,7 +488,40 @@ src/TizenChatFrame.d: ../src/TizenChatFrame.cpp \
   C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp/glmacro.h \
   C:\Users\egv\workspace\TizenChat\inc\TizenChatFormFactory.h \
   C:\Users\egv\workspace\TizenChat\inc\TizenChatPanelFactory.h \
-  C:\Users\egv\workspace\TizenChat\inc\AppResourceId.h
+  C:\Users\egv\workspace\TizenChat\inc\AppResourceId.h ../src/Utils.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIo.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFile.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFileAttributes.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFileLock.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDirectory.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDirEntry.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDirEnumerator.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoRegistry.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDatabase.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDbStatement.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDbEnumerator.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoSqlStatementBuilder.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFileEventManager.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoChannel.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoChannelTypes.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoClientChannel.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIChannelResponseEventListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoServerChannel.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIChannelRequestEventListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoMessagePortManager.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoLocalMessagePort.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoRemoteMessagePort.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoSerialPort.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoMmcStorageManager.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIMmcStorageMountListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIMmcStorageFormatListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIFileEventListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIMessagePortListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoISerialPortEventListener.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoMemoryMappedFile.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDataRow.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDataSetEnumerator.h \
+  C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDataSet.h
 
 C:\Users\egv\workspace\TizenChat\inc\TizenChatFrame.h:
 
@@ -1469,3 +1502,71 @@ C:\Users\egv\workspace\TizenChat\inc\TizenChatFormFactory.h:
 C:\Users\egv\workspace\TizenChat\inc\TizenChatPanelFactory.h:
 
 C:\Users\egv\workspace\TizenChat\inc\AppResourceId.h:
+
+../src/Utils.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIo.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFile.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFileAttributes.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFileLock.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDirectory.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDirEntry.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDirEnumerator.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoRegistry.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDatabase.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDbStatement.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDbEnumerator.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoSqlStatementBuilder.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoFileEventManager.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoChannel.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoChannelTypes.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoClientChannel.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIChannelResponseEventListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoServerChannel.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIChannelRequestEventListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoMessagePortManager.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoLocalMessagePort.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoRemoteMessagePort.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoSerialPort.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoMmcStorageManager.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIMmcStorageMountListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIMmcStorageFormatListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIFileEventListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoIMessagePortListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoISerialPortEventListener.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoMemoryMappedFile.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDataRow.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDataSetEnumerator.h:
+
+C:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FIoDataSet.h:

@@ -2,6 +2,8 @@
 #include "TizenChatMainForm.h"
 #include "AppResourceId.h"
 
+#include "Utils.h"
+
 using namespace Tizen::Base;
 using namespace Tizen::App;
 using namespace Tizen::Ui;
@@ -28,6 +30,8 @@ TizenChatMainForm::Initialize(void)
 result
 TizenChatMainForm::OnInitializing(void)
 {
+	AppLogDebug("access token: %S", Utils::getInstance().accessToken()->GetPointer());
+
 	result r = E_SUCCESS;
 
 	// TODO:
@@ -58,6 +62,8 @@ void
 TizenChatMainForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionId)
 {
 	SceneManager* pSceneManager = SceneManager::GetInstance();
+//	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_3));
+//	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_6));
 	AppAssert(pSceneManager);
 
 	switch(actionId)
@@ -69,8 +75,12 @@ TizenChatMainForm::OnActionPerformed(const Tizen::Ui::Control& source, int actio
 		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_2));
 		break;
 	case ID_HEADER_ITEM3:
+		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_6));
+		break;
+	case ID_HEADER_ITEM4:
 		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_3));
 		break;
+		
 	default:
 		break;
 	}

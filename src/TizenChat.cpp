@@ -55,7 +55,6 @@ TizenChatApp::OnAppInitialized(void)
 {
 	// TODO:
 	// Comment.
-
 	// Create a Frame
 	TizenChatFrame* pTizenChatFrame = new TizenChatFrame();
 	pTizenChatFrame->Construct();

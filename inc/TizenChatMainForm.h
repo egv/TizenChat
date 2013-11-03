@@ -30,6 +30,7 @@ protected:
 	static const int ID_HEADER_ITEM1 = 101;
 	static const int ID_HEADER_ITEM2 = 102;
 	static const int ID_HEADER_ITEM3 = 103;
+	static const int ID_HEADER_ITEM4 = 104;
 
 	virtual void OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
 								   const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs);

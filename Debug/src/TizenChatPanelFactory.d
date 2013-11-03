@@ -489,7 +489,8 @@ src/TizenChatPanelFactory.d: ../src/TizenChatPanelFactory.cpp \
   C:\Users\egv\workspace\TizenChat\inc\TizenChatTab1.h \
   C:\Users\egv\workspace\TizenChat\inc\TizenChatTab2.h \
   C:\Users\egv\workspace\TizenChat\inc\TizenChatTab3.h \
-  C:\Users\egv\workspace\TizenChat\inc\AppResourceId.h
+  C:\Users\egv\workspace\TizenChat\inc\AppResourceId.h \
+  C:\Users\egv\workspace\TizenChat\inc\SettingsPanelClass.h
 
 C:\Users\egv\workspace\TizenChat\inc\TizenChatPanelFactory.h:
 
@@ -1472,3 +1473,5 @@ C:\Users\egv\workspace\TizenChat\inc\TizenChatTab2.h:
 C:\Users\egv\workspace\TizenChat\inc\TizenChatTab3.h:
 
 C:\Users\egv\workspace\TizenChat\inc\AppResourceId.h:
+
+C:\Users\egv\workspace\TizenChat\inc\SettingsPanelClass.h:
