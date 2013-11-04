@@ -2,6 +2,7 @@
 
 const wchar_t* Contacts = L"Contacts";
 const wchar_t* GetTokenForm = L"GetTokenForm";
+const wchar_t* IDC_TABLEVIEW1 = L"IDC_TABLEVIEW1";
 const wchar_t* IDC_WEB1 = L"IDC_WEB1";
 const wchar_t* IDF_FORM = L"IDF_FORM";
 const wchar_t* IDC_LABEL1 = L"IDC_LABEL1";

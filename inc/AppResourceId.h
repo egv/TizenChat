@@ -3,6 +3,7 @@
 
 extern const wchar_t* Contacts;
 extern const wchar_t* GetTokenForm;
+extern const wchar_t* IDC_TABLEVIEW1;
 extern const wchar_t* IDC_WEB1;
 extern const wchar_t* IDF_FORM;
 extern const wchar_t* IDC_PANEL1;

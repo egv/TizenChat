@@ -15,6 +15,7 @@ class TizenChatDialogsTab
 	: public Tizen::Ui::Controls::Panel
 	, public Tizen::Ui::Scenes::ISceneEventListener
 	, public ITizenChatDataManagerEventsListener
+ 	, public Tizen::Ui::Controls::ITableViewItemProvider
 {
 public:
 	TizenChatDialogsTab(void);
@@ -33,6 +34,15 @@ public:
 	virtual void OnDataManagerUpdatedMessages();
 	virtual void OnDataManagerUpdatedUser(int userId);
 	virtual void OnDataManagerGotError(Tizen::Base::String errorText);
+
+	// table stuff
+	virtual int GetItemCount(void);
+	virtual Tizen::Ui::Controls::TableViewItem* CreateItem(int itemIndex, int itemWidth);
+	virtual Tizen::Ui::Controls::TableViewItem* CreateItemF(int itemIndex, float itemWidth);
+	virtual bool DeleteItem(int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem);
+	virtual void UpdateItem(int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem);
+	virtual int GetDefaultItemHeight(void);
+	virtual float GetDefaultItemHeightF(void);
 };
 
 #endif // _TIZENCHAT_TAB1_H_
