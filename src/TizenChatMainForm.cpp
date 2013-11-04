@@ -48,6 +48,14 @@ TizenChatMainForm::OnInitializing(void)
 	return r;
 }
 
+result
+TizenChatMainForm::OnTerminating(void)
+{
+	result r = E_SUCCESS;
+
+	return r;
+}
+
 void
 TizenChatMainForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionId)
 {
