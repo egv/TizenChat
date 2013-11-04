@@ -13,8 +13,8 @@ using namespace Tizen::Base::Collection;
 using namespace Tizen::Web::Json;
 
 Message::Message() : attachments(SingleObjectDeleter)
-                     , chatActive(SingleObjectDeleter)
                      , fwdMessages(SingleObjectDeleter)
+					 , chatActive(SingleObjectDeleter)
 {
 
 }

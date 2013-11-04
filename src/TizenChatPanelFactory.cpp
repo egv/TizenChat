@@ -1,5 +1,5 @@
 #include "TizenChatPanelFactory.h"
-#include "TizenChatTab1.h"
+#include "TizenChatDialogsTab.h"
 #include "TizenChatTab2.h"
 #include "TizenChatTab3.h"
 #include "AppResourceId.h"
@@ -25,7 +25,7 @@ TizenChatPanelFactory::CreatePanelN(const Tizen::Base::String& panelId, const Ti
 
 	if (panelId == IDC_PANEL1)
 	{
-		TizenChatTab1* pPanel = new TizenChatTab1();
+		TizenChatDialogsTab* pPanel = new TizenChatDialogsTab();
 		pPanel->Initialize();
 		pSceneManager->AddSceneEventListener(sceneId, *pPanel);
 		pNewPanel = pPanel;

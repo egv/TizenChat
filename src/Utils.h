@@ -12,6 +12,8 @@
 #include <FBase.h>
 #include <FWebJson.h>
 
+#define DELETE_NON_NULL(__what) if (__what != null) delete __what
+
 using namespace Tizen::Base;
 using namespace Tizen::Io;
 
