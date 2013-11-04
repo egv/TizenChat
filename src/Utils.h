@@ -10,9 +10,11 @@
 
 #include <FIo.h>
 #include <FBase.h>
+#include <FWebJson.h>
 
 using namespace Tizen::Base;
 using namespace Tizen::Io;
+
 
 class Utils
 {
@@ -26,6 +28,10 @@ class Utils
 
         String *accessToken();
         void setAccessToken(const String& acessToken);
+
+        result LongLongFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::LongLong &out);
+        result StringFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::String &out);
+        result LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::Collection::ArrayList &out);
 
     private:
         Registry registry;

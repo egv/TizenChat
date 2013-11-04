@@ -7,6 +7,7 @@ CPP_SRCS += \
 ../src/AppResourceId.cpp \
 ../src/GetTokenFormClass.cpp \
 ../src/LoginFormClass.cpp \
+../src/Message.cpp \
 ../src/SettingsPanelClass.cpp \
 ../src/TizenChat.cpp \
 ../src/TizenChatEntry.cpp \
@@ -23,6 +24,7 @@ OBJS += \
 ./src/AppResourceId.o \
 ./src/GetTokenFormClass.o \
 ./src/LoginFormClass.o \
+./src/Message.o \
 ./src/SettingsPanelClass.o \
 ./src/TizenChat.o \
 ./src/TizenChatEntry.o \
@@ -39,6 +41,7 @@ CPP_DEPS += \
 ./src/AppResourceId.d \
 ./src/GetTokenFormClass.d \
 ./src/LoginFormClass.d \
+./src/Message.d \
 ./src/SettingsPanelClass.d \
 ./src/TizenChat.d \
 ./src/TizenChatEntry.d \
