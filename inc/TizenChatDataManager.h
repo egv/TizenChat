@@ -32,7 +32,7 @@ public:
     void RemoveDataManagerEventsListener(const ITizenChatDataManagerEventsListener& listener);
 
     // data-related methods
-    Tizen::Base::Collection::ArrayListT<Message> *GetLastMessages();
+    Tizen::Base::Collection::ArrayList *GetLastMessages();
     void LoadLastMessages();
     void GetUser(int userId);
 
@@ -51,7 +51,7 @@ private:
 
 	Tizen::Net::Http::HttpSession* __pHttpSession;
     Tizen::Base::Collection::ArrayList* __pListeners;
-    Tizen::Base::Collection::ArrayListT<Message> *__pLastMessages;
+    Tizen::Base::Collection::ArrayList* __pLastMessages;
 
     bool getDialogsRequestRunning;
 

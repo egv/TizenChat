@@ -4,7 +4,7 @@
 #import <FBase.h>
 
 class ITizenChatDataManagerEventsListener :
-	virtual public Tizen::Base::Object
+	public Tizen::Base::Object
 {
 public:
 	virtual ~ITizenChatDataManagerEventsListener();

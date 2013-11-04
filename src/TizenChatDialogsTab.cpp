@@ -1,6 +1,8 @@
 #include "TizenChatDialogsTab.h"
 #include "AppResourceId.h"
 
+#include "TizenChatDataManager.h"
+
 using namespace Tizen::Graphics;
 using namespace Tizen::Ui;
 using namespace Tizen::Ui::Controls;
@@ -42,6 +44,9 @@ TizenChatDialogsTab::OnInitializing(void)
 	pRelativeLayout->SetVerticalFitPolicy(*this, FIT_POLICY_PARENT);
 	delete pRelativeLayout;
 
+	TizenChatDataManager::GetInstance().AddDataManagerEventsListener(*this);
+	TizenChatDataManager::GetInstance().LoadLastMessages();
+
 	return r;
 }
 
@@ -50,7 +55,7 @@ TizenChatDialogsTab::OnTerminating(void)
 {
 	result r = E_SUCCESS;
 
-	// TODO: Add your termination code here
+	TizenChatDataManager::GetInstance().RemoveDataManagerEventsListener(*this);
 
 	return r;
 }
@@ -72,3 +77,22 @@ TizenChatDialogsTab::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& curren
 	// Add your scene deactivate code here
 	AppLog("OnSceneDeactivated");
 }
+
+void
+TizenChatDialogsTab::OnDataManagerUpdatedMessages()
+{
+
+}
+
+void
+TizenChatDialogsTab::OnDataManagerUpdatedUser(int userId)
+{
+
+}
+
+void
+TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::String errorText)
+{
+
+}
+

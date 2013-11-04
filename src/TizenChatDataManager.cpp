@@ -9,6 +9,7 @@
 #include <FNet.h>
 #include <FWebJson.h>
 
+#include "ITizenChatDatamanagerEventsListener.h"
 #include "TizenChatDataManager.h"
 #include "Utils.h"
 #include "Message.h"
@@ -53,6 +54,13 @@ TizenChatDataManager::RemoveDataManagerEventsListener(const ITizenChatDataManage
 	{
 		__pListeners->Remove(listener);
 	}
+}
+
+
+ArrayList*
+TizenChatDataManager::GetLastMessages()
+{
+	return __pLastMessages;
 }
 
 void
@@ -154,19 +162,31 @@ TizenChatDataManager::OnTransactionCertVerificationRequiredN(HttpSession& httpSe
 void
 TizenChatDataManager::NotifyMessagesUpdated()
 {
+	if (__pListeners == null)
+	{
+		return;
+	}
 
+	IEnumerator* pEnum = __pListeners->GetEnumeratorN();
+	ITizenChatDataManagerEventsListener* pObj = null;
+	while (pEnum->MoveNext() == E_SUCCESS)
+	{
+		pObj = (ITizenChatDataManagerEventsListener*)(pEnum->GetCurrent());
+		pObj->OnDataManagerUpdatedMessages();
+	}
+
+	delete pEnum;
 }
 
 void
 TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 {
-/*
 	getDialogsRequestRunning = false;
 
 	if (__pLastMessages == null)
 	{
-		__pLastMessages = new ArrayListT<Message>();
-		__pLastMessages->Construct(1000);
+		__pLastMessages = new ArrayList();
+		__pLastMessages->Construct();
 	}
 
 
@@ -224,7 +244,7 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 			AppLogDebug("total messages received: %d", __pLastMessages->GetCount());
 		}
 	}
-*/
+
 	NotifyMessagesUpdated();
 }
 
