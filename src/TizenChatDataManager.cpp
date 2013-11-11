@@ -70,45 +70,45 @@ TizenChatDataManager::LoadLastMessages()
 		return;
 
 	getDialogsRequestRunning = true;
-
-	result r = E_SUCCESS;
-	HttpTransaction* pHttpTransaction = null;
-	HttpRequest* pHttpRequest = null;
-
-	if (__pHttpSession == null)
-	{
-		__pHttpSession = new (std::nothrow) HttpSession();
-
-		r = __pHttpSession->Construct(NET_HTTP_SESSION_MODE_NORMAL,
-				null,
-				HTTP_CLIENT_HOST_ADDRESS,
-				null);
-	}
-	else
-	{
-		AppLogDebug("http session is not null, but it should be");
-	}
-
-	pHttpTransaction = __pHttpSession->OpenTransactionN();
-	r = pHttpTransaction->AddHttpTransactionListener(*this);
-
-	pHttpRequest = const_cast<HttpRequest*>(pHttpTransaction->GetRequest());
-
 	String url(L"https://api.vk.com/method/messages.getDialogs?v=5.2&count=200&access_token=");
 	url.Append(*(Utils::getInstance().accessToken()));
 
 	AppLogDebug("request url: %S", url.GetPointer());
 
-	pHttpTransaction->SetUserObject(new Integer(GET_DIALOGS_REQUEST_TAG));
-
-	r = pHttpRequest->SetUri(url);
-	r = pHttpRequest->SetMethod(NET_HTTP_METHOD_GET);
-	r = pHttpTransaction->Submit();
+	result r = SendGetRequest(url, new Integer(GET_DIALOGS_REQUEST_TAG));
 
 	if (r != E_SUCCESS)
 	{
 		AppLogDebug("error sending request");
+		getDialogsRequestRunning = false;
 	}
+}
+
+void
+TizenChatDataManager::ObtainLongPollServerData()
+{
+	if (__getLongPollServerDataRequest)
+		return;
+
+	__getLongPollServerDataRequest = true;
+	String url(L"https://api.vk.com/method/messages.getLongPollServer?v=5.2&access_token=");
+	url.Append(*(Utils::getInstance().accessToken()));
+
+	AppLogDebug("request url: %S", url.GetPointer());
+
+	result r = SendGetRequest(url, new Integer(GET_LONG_POLL_SERVER_DATA_REQUEST_TAG));
+
+	if (r != E_SUCCESS)
+	{
+		AppLogDebug("error sending request");
+		__getLongPollServerDataRequest = false;
+	}
+}
+
+LongPollServerData*
+TizenChatDataManager::GetLongPollServerData()
+{
+	return __pLongPollServerData;
 }
 
 void
@@ -121,6 +121,10 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 	{
 	case GET_DIALOGS_REQUEST_TAG:
 		ParseMessages(httpTransaction);
+		break;
+
+	case GET_LONG_POLL_SERVER_DATA_REQUEST_TAG:
+		ParseLongPollServerData(httpTransaction);
 		break;
 
 	default:
@@ -159,6 +163,42 @@ TizenChatDataManager::OnTransactionCertVerificationRequiredN(HttpSession& httpSe
 
 }
 
+result
+TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag)
+{
+	result r = E_SUCCESS;
+	HttpTransaction* pHttpTransaction = null;
+	HttpRequest* pHttpRequest = null;
+
+	if (__pHttpSession == null)
+	{
+		__pHttpSession = new (std::nothrow) HttpSession();
+
+		r = __pHttpSession->Construct(NET_HTTP_SESSION_MODE_NORMAL,
+				null,
+				HTTP_CLIENT_HOST_ADDRESS,
+				null);
+	}
+	else
+	{
+		AppLogDebug("http session is not null, but it should be");
+	}
+
+	pHttpTransaction = __pHttpSession->OpenTransactionN();
+	r = pHttpTransaction->AddHttpTransactionListener(*this);
+
+	pHttpRequest = const_cast<HttpRequest*>(pHttpTransaction->GetRequest());
+
+	pHttpTransaction->SetUserObject(tag);
+
+	r = pHttpRequest->SetUri(url);
+	r = pHttpRequest->SetMethod(NET_HTTP_METHOD_GET);
+	r = pHttpTransaction->Submit();
+
+	return r;
+}
+
+
 void
 TizenChatDataManager::NotifyMessagesUpdated()
 {
@@ -176,6 +216,78 @@ TizenChatDataManager::NotifyMessagesUpdated()
 	}
 
 	delete pEnum;
+}
+
+void
+TizenChatDataManager::NotifyLongPollServerDataUpdated()
+{
+	if (__pListeners == null)
+	{
+		return;
+	}
+
+	IEnumerator* pEnum = __pListeners->GetEnumeratorN();
+	ITizenChatDataManagerEventsListener* pObj = null;
+	while (pEnum->MoveNext() == E_SUCCESS)
+	{
+		pObj = (ITizenChatDataManagerEventsListener*)(pEnum->GetCurrent());
+		pObj->OnDataManagerUpdatedLongPollServerData();
+	}
+
+	delete pEnum;
+}
+
+
+
+void
+TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
+{
+	__getLongPollServerDataRequest = false;
+
+	if (__pLongPollServerData == null)
+	{
+		__pLongPollServerData = new LongPollServerData();
+	}
+
+
+	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
+	// The GetHttpStatusCode() method is used to get the HTTP status from the response header.
+	// If the status code is HTTP_STATUS_OK, the transaction is a success.
+	AppLogDebug("http response status code: %d", pHttpResponse->GetHttpStatusCode());
+	if (pHttpResponse->GetHttpStatusCode() == HTTP_STATUS_OK)
+	{
+		HttpHeader* pHttpHeader = pHttpResponse->GetHeader();
+		// The GetRawHeaderN() method gets the HTTP header information from the response,
+		// while the ReadBodyN() method gets the content body information.
+		if (pHttpHeader != null)
+		{
+			ByteBuffer* pBuffer = pHttpResponse->ReadBodyN();
+
+			IJsonValue *pJsonValue = JsonParser::ParseN(*pBuffer);
+			if (pJsonValue->GetType() == JSON_TYPE_OBJECT)
+			{
+				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
+
+				IJsonValue *pResponseJsonValue = null;
+				pJsonObject->GetValue(new String(L"response"), pResponseJsonValue);
+
+				JsonObject *pResponseJsonObject = static_cast<JsonObject*>(pResponseJsonValue);
+				result r = __pLongPollServerData->FillWithJsonObject(*pResponseJsonObject);
+
+				if (r != E_SUCCESS)
+				{
+					AppLogDebug("error parsing long poll object");
+					delete __pLongPollServerData;
+					__pLongPollServerData = null;
+				}
+			}
+
+			delete pBuffer;
+			delete pJsonValue;
+		}
+	}
+
+	NotifyLongPollServerDataUpdated();
 }
 
 void

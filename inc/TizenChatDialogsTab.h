@@ -26,16 +26,25 @@ public:
 	virtual result OnInitializing(void);
 	virtual result OnTerminating(void);
 
+	//
+	// Scene handling stuff
+	//
 	virtual void OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
 								   const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs);
 	virtual void OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId,
 									const Tizen::Ui::Scenes::SceneId& nextSceneId);
 
+	//
+	// Data manager delegate interface
+	//
+	virtual void OnDataManagerUpdatedLongPollServerData();
 	virtual void OnDataManagerUpdatedMessages();
 	virtual void OnDataManagerUpdatedUser(int userId);
 	virtual void OnDataManagerGotError(Tizen::Base::String errorText);
 
+	//
 	// table stuff
+	//
 	virtual int GetItemCount(void);
 	virtual Tizen::Ui::Controls::TableViewItem* CreateItem(int itemIndex, int itemWidth);
 	virtual Tizen::Ui::Controls::TableViewItem* CreateItemF(int itemIndex, float itemWidth);

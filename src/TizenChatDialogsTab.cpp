@@ -96,6 +96,12 @@ TizenChatDialogsTab::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& curren
 }
 
 void
+TizenChatDialogsTab::OnDataManagerUpdatedLongPollServerData()
+{
+
+}
+
+void
 TizenChatDialogsTab::OnDataManagerUpdatedMessages()
 {
 
@@ -112,6 +118,12 @@ TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::String errorText)
 {
 
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Table View things
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 int
 TizenChatDialogsTab::GetItemCount(void)

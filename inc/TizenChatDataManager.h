@@ -13,6 +13,7 @@
 
 #import "Message.h"
 #import "ITizenChatDataManagerEventsListener.h"
+#import "LongPollServerData.h"
 
 using namespace Tizen::Net::Http;
 
@@ -36,6 +37,11 @@ public:
     void LoadLastMessages();
     void GetUser(int userId);
 
+    // long poll server data
+    void ObtainLongPollServerData();
+    LongPollServerData* GetLongPollServerData();
+
+
     // HttpTransactionListener methods
 	virtual void OnTransactionReadyToRead(Tizen::Net::Http::HttpSession& httpSession,
 			                              Tizen::Net::Http::HttpTransaction& httpTransaction,
@@ -47,15 +53,19 @@ public:
 	virtual void OnTransactionCertVerificationRequiredN(HttpSession& httpSession, HttpTransaction& httpTransaction, Tizen::Base::String* pCert);
 
 private:
+	static const int GET_LONG_POLL_SERVER_DATA_REQUEST_TAG = 100;
 	static const int GET_DIALOGS_REQUEST_TAG = 101;
 
+	LongPollServerData* __pLongPollServerData;
 	Tizen::Net::Http::HttpSession* __pHttpSession;
     Tizen::Base::Collection::ArrayList* __pListeners;
     Tizen::Base::Collection::ArrayList* __pLastMessages;
 
     bool getDialogsRequestRunning;
+    bool __getLongPollServerDataRequest;
 
     TizenChatDataManager() : __pHttpSession(null)
+                           , __pLongPollServerData(null)
     {
 
     };                   // Constructor? (the {} brackets) are needed here.
@@ -68,7 +78,18 @@ private:
 
     ~TizenChatDataManager();
 
+    result SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag);
+
+    //
+    // Notifications
+    //
+    void NotifyLongPollServerDataUpdated();
     void NotifyMessagesUpdated();
+
+    //
+    // Parsers
+    //
+    void ParseLongPollServerData(HttpTransaction &httpTransaction);
     void ParseMessages(HttpTransaction& httpTransaction);
     void ParseUser();
 };

@@ -9,6 +9,7 @@ class ITizenChatDataManagerEventsListener :
 public:
 	virtual ~ITizenChatDataManagerEventsListener();
 
+	virtual void OnDataManagerUpdatedLongPollServerData() = 0;
 	virtual void OnDataManagerUpdatedMessages() = 0;
 	virtual void OnDataManagerUpdatedUser(int userId) = 0;
 
