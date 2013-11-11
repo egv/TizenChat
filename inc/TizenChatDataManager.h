@@ -35,6 +35,8 @@ public:
     // data-related methods
     Tizen::Base::Collection::ArrayList *GetLastMessages();
     void LoadLastMessages();
+    void LoadLongPollHistory();
+
     void GetUser(int userId);
 
     // long poll server data
@@ -55,6 +57,7 @@ public:
 private:
 	static const int GET_LONG_POLL_SERVER_DATA_REQUEST_TAG = 100;
 	static const int GET_DIALOGS_REQUEST_TAG = 101;
+	static const int GET_LONG_POLL_HISTORY_REQUEST_TAG = 102;
 
 	LongPollServerData* __pLongPollServerData;
 	Tizen::Net::Http::HttpSession* __pHttpSession;
@@ -89,8 +92,9 @@ private:
     //
     // Parsers
     //
-    void ParseLongPollServerData(HttpSession& httpSession, HttpTransaction &httpTransaction);
-    void ParseMessages(HttpSession& httpSession, HttpTransaction& httpTransaction);
+    void ParseLongPollServerData(HttpTransaction &httpTransaction);
+    void ParseLongPollHistory(HttpTransaction &httpTransaction);
+    void ParseMessages(HttpTransaction& httpTransaction);
     void ParseUser();
 };
 

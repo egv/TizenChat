@@ -84,11 +84,11 @@
 </Reference>
 <Reference URI="bin/TizenChat.exe">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>oxaChB7I0vrMecJFvksmGHXlER762UvUI0It4DXIF8I=</DigestValue>
+<DigestValue>8WP/Ta990iOf2zHeFAqz9cKjtLmYAc0nEaUlY0TYzr4=</DigestValue>
 </Reference>
 <Reference URI="author-signature.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>SJ9iaxfgEUKxqjWsO2aTfsBwyZCxSZo4eL6eRbGfyvM=</DigestValue>
+<DigestValue>WTTkFv5T1ToGKjMFrIf1e61tHzd6mAqCTD5+VLU8BC0=</DigestValue>
 </Reference>
 <Reference URI="#prop">
 <Transforms>
@@ -99,9 +99,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-WdUIzPu2Ix761BBhVgU+RqQftxUoAyG95vVd6iNPZlZLeS8rnCh+CmzXBjMiSopPdw0wMP3e0bFK
-E9RwiK0PjB4MxfLiN6ITKnPb+dXmQlY7JrbnXeJtHcbswV09uwexXaBwKvbHn+kA0xW3LJo62PmX
-WzbKNqf4u6SfnJ3fMbA=
+LfXX/YD7GpwMvxYMqNdFETjEJ1yiaO5RWaBixq81gYH7b18/KgQB8H0OgvjDcsYxRDjMNmJEGRrA
+ZNwEppmmmJBQJncSTuU+uCZWUgHuvapfp5RHVL6WtAHbSwdDGs49ZkG2y789E4xmiHhDMhfKc5nl
+LhYLfLTmLdI/zF9FQiE=
 </SignatureValue>
 <KeyInfo>
 <X509Data>
