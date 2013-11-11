@@ -31,6 +31,8 @@ class Utils
         String *accessToken();
         void setAccessToken(const String& acessToken);
 
+        result JsonValueAtPath(Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& path, Tizen::Web::Json::IJsonValue*& jsonValue);
+
         result LongLongFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::LongLong &out);
         result StringFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::String &out);
         result LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::Collection::ArrayList &out);

@@ -13,6 +13,7 @@
 #include <FWebJson.h>
 
 using namespace Tizen::Base;
+using namespace Tizen::Base::Utility;
 using namespace Tizen::Base::Collection;
 using namespace Tizen::App;
 using namespace Tizen::Io;
@@ -189,3 +190,26 @@ Utils::LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, c
 CATCH:
 	return E_INVALID_ARG;
 }
+
+result
+Utils::JsonValueAtPath(Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& path, Tizen::Web::Json::IJsonValue*& jsonValue)
+{
+	result r = E_SUCCESS;
+
+	String delim(L"/");
+	StringTokenizer tok(path, delim);
+
+	while(tok.HasMoreTokens())
+	{
+		String token;
+		tok.GetNextToken(token);
+
+		IJsonValue* __pJsonValue = null;
+		JsonObject* __pJsonObject = jsonValue == null ? &object : static_cast<JsonObject*>(jsonValue);
+		__pJsonObject->GetValue(new String(token), __pJsonValue);
+		jsonValue = __pJsonValue;
+	}
+
+	return r;
+}
+

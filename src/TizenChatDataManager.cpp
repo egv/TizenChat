@@ -328,36 +328,35 @@ TizenChatDataManager::ParseMessages(HttpSession& httpSession, HttpTransaction &h
 			{
 				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
 
-				IJsonValue *pResponseJsonValue = null;
-				pJsonObject->GetValue(new String(L"response"), pResponseJsonValue);
-				JsonObject *pResponseJsonObject = static_cast<JsonObject*>(pResponseJsonValue);
-
-				IJsonValue *pMessagesJsonValue = null;
-				pResponseJsonObject->GetValue(new String(L"messages"), pMessagesJsonValue);
-				JsonObject *pMessagesJsonObject = static_cast<JsonObject*>(pMessagesJsonValue);
-
 				IJsonValue *pJsonArrayValue = null;
-				pMessagesJsonObject->GetValue(new String(L"items"), pJsonArrayValue);
-				JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
-
-				IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
-				if(pEnum)
+				result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/messages/items"), pJsonArrayValue);
+				if (r == E_SUCCESS)
 				{
-					while( pEnum->MoveNext() == E_SUCCESS )
-					{
-						IJsonValue* pJsonValue = null;
-						//Uses the pJsonValue
-						pEnum->GetCurrent(pJsonValue);
-						JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+					JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
 
-						Message* pMessage = new Message();
-						result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
-						if (r == E_SUCCESS)
+					IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
+					if(pEnum)
+					{
+						while( pEnum->MoveNext() == E_SUCCESS )
 						{
-							__pLastMessages->Add(*pMessage);
+							IJsonValue* pJsonValue = null;
+							//Uses the pJsonValue
+							pEnum->GetCurrent(pJsonValue);
+							JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+
+							Message* pMessage = new Message();
+							result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
+							if (r == E_SUCCESS)
+							{
+								__pLastMessages->Add(*pMessage);
+							}
 						}
+						delete pEnum;
 					}
-					delete pEnum;
+				}
+				else
+				{
+					AppLogDebug("failed to get array at correct path");
 				}
 			}
 
