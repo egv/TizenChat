@@ -52,6 +52,9 @@ public:
 	virtual void UpdateItem(int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem);
 	virtual int GetDefaultItemHeight(void);
 	virtual float GetDefaultItemHeightF(void);
+
+private:
+	void LoadChatHistory();
 };
 
 #endif // _TIZENCHAT_TAB1_H_

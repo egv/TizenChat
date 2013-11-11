@@ -69,8 +69,13 @@ TizenChatDataManager::LoadLastMessages()
 	if (getDialogsRequestRunning)
 		return;
 
+	if (__pLongPollServerData == null)
+		return;
+
 	getDialogsRequestRunning = true;
-	String url(L"https://api.vk.com/method/messages.getDialogs?v=5.2&count=200&access_token=");
+	String url(L"https://api.vk.com/method/messages.getLongPollHistory?v=5.2&max_msg_id=1&msgs_limi=200&ts=");
+	url.Append(__pLongPollServerData->ts.ToString());
+	url.Append("&access_token=");
 	url.Append(*(Utils::getInstance().accessToken()));
 
 	AppLogDebug("request url: %S", url.GetPointer());
@@ -120,11 +125,12 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 	switch (opCode)
 	{
 	case GET_DIALOGS_REQUEST_TAG:
-		ParseMessages(httpTransaction);
+		AppLogDebug("will parse messages");
+		ParseMessages(httpSession, httpTransaction);
 		break;
 
 	case GET_LONG_POLL_SERVER_DATA_REQUEST_TAG:
-		ParseLongPollServerData(httpTransaction);
+		ParseLongPollServerData(httpSession, httpTransaction);
 		break;
 
 	default:
@@ -136,7 +142,7 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 void
 TizenChatDataManager::OnTransactionAborted(HttpSession& httpSession, HttpTransaction& httpTransaction, result r)
 {
-
+	AppLogDebug("On transaction aborted");
 }
 
 void
@@ -148,13 +154,12 @@ TizenChatDataManager::OnTransactionReadyToWrite(HttpSession& httpSession, HttpTr
 void
 TizenChatDataManager::OnTransactionHeaderCompleted(HttpSession& httpSession, HttpTransaction& httpTransaction, int headerLen, bool bAuthRequired)
 {
-
 }
 
 void
 TizenChatDataManager::OnTransactionCompleted(HttpSession& httpSession, HttpTransaction& httpTransaction)
 {
-
+	AppLogDebug("On transaction completed");
 }
 
 void
@@ -181,6 +186,7 @@ TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Obje
 	}
 	else
 	{
+		__pHttpSession->CloseAllTransactions();
 		AppLogDebug("http session is not null, but it should be");
 	}
 
@@ -240,7 +246,7 @@ TizenChatDataManager::NotifyLongPollServerDataUpdated()
 
 
 void
-TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
+TizenChatDataManager::ParseLongPollServerData(HttpSession& httpSession, HttpTransaction &httpTransaction)
 {
 	__getLongPollServerDataRequest = false;
 
@@ -287,12 +293,14 @@ TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
 		}
 	}
 
+	httpSession.CloseTransaction(httpTransaction);
 	NotifyLongPollServerDataUpdated();
 }
 
 void
-TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
+TizenChatDataManager::ParseMessages(HttpSession& httpSession, HttpTransaction &httpTransaction)
 {
+	AppLogDebug("hit parse messages");
 	getDialogsRequestRunning = false;
 
 	if (__pLastMessages == null)
@@ -322,11 +330,14 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 
 				IJsonValue *pResponseJsonValue = null;
 				pJsonObject->GetValue(new String(L"response"), pResponseJsonValue);
-
 				JsonObject *pResponseJsonObject = static_cast<JsonObject*>(pResponseJsonValue);
 
+				IJsonValue *pMessagesJsonValue = null;
+				pResponseJsonObject->GetValue(new String(L"messages"), pMessagesJsonValue);
+				JsonObject *pMessagesJsonObject = static_cast<JsonObject*>(pMessagesJsonValue);
+
 				IJsonValue *pJsonArrayValue = null;
-				pResponseJsonObject->GetValue(new String(L"items"), pJsonArrayValue);
+				pMessagesJsonObject->GetValue(new String(L"items"), pJsonArrayValue);
 				JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
 
 				IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
@@ -357,6 +368,7 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 		}
 	}
 
+	httpSession.CloseTransaction(httpTransaction);
 	NotifyMessagesUpdated();
 }
 

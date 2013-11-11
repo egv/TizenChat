@@ -30,8 +30,7 @@ TizenChatMainForm::Initialize(void)
 result
 TizenChatMainForm::OnInitializing(void)
 {
-	AppLogDebug("access token: %S", Utils::getInstance().accessToken()->GetPointer());
-
+	AppLog("on initializing main form");
 	result r = E_SUCCESS;
 
 	// TODO:

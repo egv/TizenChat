@@ -1,5 +1,5 @@
 Debug/
 Release/
 crash-info/
-
-
+Debug\\.gdbinit
+.rds_delta

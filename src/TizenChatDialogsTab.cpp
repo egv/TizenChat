@@ -51,13 +51,15 @@ TizenChatDialogsTab::OnInitializing(void)
 	delete pRelativeLayout;
 
 	TizenChatDataManager::GetInstance().AddDataManagerEventsListener(*this);
-	TizenChatDataManager::GetInstance().LoadLastMessages();
+
+	LoadChatHistory();
 
 	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));  
 	if(pTableview1)
 	{
 		pTableview1->SetItemProvider(this);
 	}
+
 	return r;
 }
 
@@ -83,7 +85,6 @@ TizenChatDialogsTab::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previou
 	{
 		pTableview1->UpdateTableView();
 	}
-
 }
 
 void
@@ -98,13 +99,17 @@ TizenChatDialogsTab::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& curren
 void
 TizenChatDialogsTab::OnDataManagerUpdatedLongPollServerData()
 {
-
+	LoadChatHistory();
 }
 
 void
 TizenChatDialogsTab::OnDataManagerUpdatedMessages()
 {
-
+	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
+	if(pTableview1)
+	{
+		pTableview1->UpdateTableView();
+	}
 }
 
 void
@@ -189,3 +194,20 @@ TizenChatDialogsTab::GetDefaultItemHeightF(void)
 	return 100.0f;
 
 }
+
+//
+// private things
+//
+void
+TizenChatDialogsTab::LoadChatHistory()
+{
+	if (TizenChatDataManager::GetInstance().GetLongPollServerData() == null)
+	{
+		TizenChatDataManager::GetInstance().ObtainLongPollServerData();
+	}
+	else
+	{
+		TizenChatDataManager::GetInstance().LoadLastMessages();
+	}
+}
+

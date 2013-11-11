@@ -89,8 +89,8 @@ private:
     //
     // Parsers
     //
-    void ParseLongPollServerData(HttpTransaction &httpTransaction);
-    void ParseMessages(HttpTransaction& httpTransaction);
+    void ParseLongPollServerData(HttpSession& httpSession, HttpTransaction &httpTransaction);
+    void ParseMessages(HttpSession& httpSession, HttpTransaction& httpTransaction);
     void ParseUser();
 };
 
