@@ -13,6 +13,7 @@
 #include "TizenChatDataManager.h"
 #include "Utils.h"
 #include "Message.h"
+#include "DatabaseManager.h"
 
 const static wchar_t* HTTP_CLIENT_HOST_ADDRESS = L"https://api.vk.com";
 
@@ -410,8 +411,10 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 
 								Message* pMessage = new Message();
 								result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
+								// FIXME: add them as a bunch in one transaction
 								if (r == E_SUCCESS)
 								{
+									DatabaseManager::GetInstance().SaveOrUpdateMessage(pMessage);
 									__pLastMessages->Add(*pMessage);
 								}
 							}
@@ -499,6 +502,7 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 								result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
 								if (r == E_SUCCESS)
 								{
+									DatabaseManager::GetInstance().SaveOrUpdateMessage(pMessage);
 									__pLastMessages->Add(*pMessage);
 								}
 							}

@@ -103,7 +103,37 @@ DatabaseManager::GetChatMessages(int chatId)
 void
 DatabaseManager::SaveOrUpdateMessage(Message* pMessage)
 {
+	if (__pDatabase == null || pMessage == null)
+	{
+		return;
+	}
 
+	String sql(L"insert or replace into Messages ");
+	sql.Append(" (id, date, out, read_state, title, body, user_id, chat_id, admin_id) ");
+	sql.Append(" values ");
+	sql.Append(" (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+	__pDatabase->BeginTransaction();
+
+	DbStatement *pStmt = __pDatabase->CreateStatementN(sql);
+
+	pStmt->BindInt(0, pMessage->id.ToInt());					// message id
+	pStmt->BindInt(1, pMessage->date.ToInt());					// message date
+	pStmt->BindInt(2, pMessage->isOut.ToInt());					// is it outgoing?
+	pStmt->BindInt(3, pMessage->readState.ToInt());				// is it read?
+	pStmt->BindString(4, pMessage->title);
+	pStmt->BindString(5, pMessage->body);
+	pStmt->BindInt(6, pMessage->userId.ToInt());
+	pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
+	pStmt->BindInt(8, pMessage->adminId.ToInt());
+
+	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+    AppAssert(!pEnum);
+
+    delete pStmt;
+    delete pEnum;
+
+    __pDatabase-> CommitTransaction();
 }
 
 //
