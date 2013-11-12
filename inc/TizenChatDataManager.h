@@ -33,7 +33,6 @@ public:
     void RemoveDataManagerEventsListener(const ITizenChatDataManagerEventsListener& listener);
 
     // data-related methods
-    Tizen::Base::Collection::ArrayList *GetLastMessages();
     void LoadLastMessages();
     void LoadLongPollHistory();
 
@@ -65,13 +64,12 @@ private:
 	LongPollServerData* __pLongPollServerData;
 	Tizen::Net::Http::HttpSession* __pHttpSession;
     Tizen::Base::Collection::ArrayList* __pListeners;
-    Tizen::Base::Collection::ArrayList* __pLastMessages;
 
     bool getDialogsRequestRunning;
     bool __getLongPollServerDataRequest;
 
-    TizenChatDataManager() : __pHttpSession(null)
-                           , __pLongPollServerData(null)
+    TizenChatDataManager() : __pLongPollServerData(null)
+                           , __pHttpSession(null)
     {
 
     };                   // Constructor? (the {} brackets) are needed here.

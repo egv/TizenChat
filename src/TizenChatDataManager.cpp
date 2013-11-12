@@ -60,13 +60,6 @@ TizenChatDataManager::RemoveDataManagerEventsListener(const ITizenChatDataManage
 	}
 }
 
-
-ArrayList*
-TizenChatDataManager::GetLastMessages()
-{
-	return __pLastMessages;
-}
-
 void
 TizenChatDataManager::LoadLongPollHistory()
 {
