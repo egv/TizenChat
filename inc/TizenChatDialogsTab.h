@@ -54,6 +54,8 @@ public:
 	virtual float GetDefaultItemHeightF(void);
 
 private:
+	Tizen::Base::Collection::ArrayList* __pMessagesList;
+
 	static const int INVALID_TOKEN_ERROR_CODE = 5;
 
 	void LoadChatHistory();

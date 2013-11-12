@@ -4,6 +4,8 @@
 #include "TizenChatDataManager.h"
 
 #include <FBase.h>
+
+#include "DatabaseManager.h"
 #include "Message.h"
 
 using namespace Tizen::Graphics;
@@ -16,12 +18,15 @@ using namespace Tizen::Base::Collection;
 
 TizenChatDialogsTab::TizenChatDialogsTab(void)
 {
-
+	__pMessagesList = null;
 }
 
 TizenChatDialogsTab::~TizenChatDialogsTab(void)
 {
-
+	if (__pMessagesList != null)
+	{
+		delete __pMessagesList;
+	}
 }
 
 bool
@@ -105,6 +110,13 @@ TizenChatDialogsTab::OnDataManagerUpdatedLongPollServerData()
 void
 TizenChatDialogsTab::OnDataManagerUpdatedMessages()
 {
+	if (__pMessagesList != null)
+	{
+		delete __pMessagesList;
+	}
+
+	__pMessagesList = DatabaseManager::GetInstance().GetLastMessages();
+
 	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
 	if(pTableview1)
 	{
@@ -146,7 +158,7 @@ TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tize
 int
 TizenChatDialogsTab::GetItemCount(void)
 {
-	ArrayList *arr = TizenChatDataManager::GetInstance().GetLastMessages();
+	ArrayList *arr = __pMessagesList;
 
 	return arr == null ? 0 : arr->GetCount();
 }
@@ -157,7 +169,7 @@ TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
 	TableViewItem* pItem = new TableViewItem();
     pItem->Construct(Dimension(itemWidth, GetDefaultItemHeight()), TABLE_VIEW_ANNEX_STYLE_NORMAL);
 
-    Message *pMessage = (Message *)TizenChatDataManager::GetInstance().GetLastMessages()->GetAt(itemIndex);
+    Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
 
     Label* pLabel = new Label();
     pLabel->Construct(Rectangle(0, 0, itemWidth, GetDefaultItemHeight()), pMessage->body);

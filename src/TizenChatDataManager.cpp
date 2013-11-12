@@ -418,6 +418,7 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 									__pLastMessages->Add(*pMessage);
 								}
 							}
+
 							delete pEnum;
 						}
 					}

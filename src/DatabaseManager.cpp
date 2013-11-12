@@ -75,15 +75,25 @@ DatabaseManager::GetLastMessages(void)
 	ArrayList* pArrayList = new ArrayList();
 	pArrayList->Construct();
 
-//	String sql("select");
-//	sql.Append("m.id, m.date, m.out, m.read_state, m.title, m.body, m.chat_id, ");
-//	sql.Append("u.id, u.first_name, u.last_name, u.sex, u.screen_name, u.photo, u.photo_medium_rec, u.online, ");
-//	sql.Append("a.id, a.first_name, a.last_name, a.sex, a.screen_name, a.photo, a.photo_medium_rec, a.online ");
-//	sql.Append("from Messages as m ");
-//	sql.Append("left outer join Users as u on u.id = m.user_id ");
-//	sql.Append("left outer join Users as a on a.id = m.admin_id ");
-//	sql.Append("group by m.chat_id ");
-//	sql.Append("order by m.date asc");
+	String sql("select ");
+	sql.Append("m.id, max(m.date), m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
+	sql.Append("from Messages as m ");
+	sql.Append("group by m.chat_id ");
+	sql.Append("order by m.date asc");
+
+	DbStatement* pStmt = __pDatabase->CreateStatementN(sql);
+	AppAssert(pStmt);
+
+	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+	AppAssert(pEnum);
+
+	while (pEnum->MoveNext() == E_SUCCESS)
+	{
+		pArrayList->Add(GetMessageFromEnumerator(pEnum));
+	}
+
+	delete pStmt;
+	delete pEnum;
 
 	return pArrayList;
 }
@@ -118,7 +128,7 @@ DatabaseManager::SaveOrUpdateMessage(Message* pMessage)
 	DbStatement *pStmt = __pDatabase->CreateStatementN(sql);
 
 	pStmt->BindInt(0, pMessage->id.ToInt());					// message id
-	pStmt->BindInt(1, pMessage->date.ToInt());					// message date
+	pStmt->BindInt64(1, pMessage->date.ToInt());					// message date
 	pStmt->BindInt(2, pMessage->isOut.ToInt());					// is it outgoing?
 	pStmt->BindInt(3, pMessage->readState.ToInt());				// is it read?
 	pStmt->BindString(4, pMessage->title);
@@ -143,6 +153,36 @@ Message*
 DatabaseManager::GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum)
 {
 	Message* pMessage = new Message();
+
+	int i;
+	long long ll;
+	String s;
+
+	// 	sql.Append("m.id, max(m.date), m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
+
+	pEnum->GetIntAt(0, i);
+	pMessage->id = LongLong(i);
+
+	pEnum->GetInt64At(1, ll);
+	pMessage->date = LongLong(ll);
+
+	pEnum->GetIntAt(2, i);
+	pMessage->isOut = LongLong(i);
+
+	pEnum->GetIntAt(3, i);
+	pMessage->readState = LongLong(i);
+
+	pEnum->GetStringAt(4, pMessage->title);
+	pEnum->GetStringAt(5, pMessage->body);
+
+	pEnum->GetIntAt(6, i);
+	pMessage->chatId = LongLong(i);
+
+	pEnum->GetIntAt(7, i);
+	pMessage->userId = LongLong(i);
+
+	pEnum->GetIntAt(8, i);
+	pMessage->adminId = LongLong(i);
 
 	return pMessage;
 }
