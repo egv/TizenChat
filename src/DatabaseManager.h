@@ -39,6 +39,7 @@ private:
     DatabaseManager(DatabaseManager const&);              // Don't Implement
     void operator=(DatabaseManager const&);               // Don't implement
 
+    Tizen::Base::Collection::ArrayList* GetUnknownUsers();
     Message *GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
 };
 

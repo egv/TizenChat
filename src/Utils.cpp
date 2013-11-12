@@ -213,3 +213,25 @@ Utils::JsonValueAtPath(Tizen::Web::Json::JsonObject& object, const Tizen::Base::
 	return r;
 }
 
+result
+Utils::JoinNumbersArrayList(Tizen::Base::Collection::ArrayList arr, Tizen::Base::String& str)
+{
+	result r = E_SUCCESS;
+
+	str = String(L"");
+
+	if (arr.GetCount() > 0)
+	{
+		Number *number = static_cast<Number*>(arr.GetAt(0));
+		str.Append(number->ToString());
+		for (int i=1; i < arr.GetCount(); i++)
+		{
+			Number *number = static_cast<Number*>(arr.GetAt(i));
+			str.Append(L",");
+			str.Append(number->ToString());
+		}
+	}
+
+	return r;
+}
+

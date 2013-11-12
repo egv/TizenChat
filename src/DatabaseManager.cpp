@@ -146,6 +146,44 @@ DatabaseManager::SaveOrUpdateMessage(Message* pMessage)
     __pDatabase-> CommitTransaction();
 }
 
+Tizen::Base::Collection::ArrayList*
+DatabaseManager::GetUnknownUsers()
+{
+	ArrayList* pArrayList = new ArrayList();
+	pArrayList->Construct(1000);
+
+	String sqls[] = {
+			String("select distinct user_id from Messages where user_id not in (select id from Users)"),
+			String("select distinct admin_id from Messages where user_id not in (select id from Users)")
+	};
+
+	for (int i=0; i < 2; i++)
+	{
+		DbStatement *pStmt = __pDatabase->CreateStatementN(sqls[i]);
+		AppAssert(pStmt);
+
+		DbEnumerator *pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+		AppAssert(pEnum);
+		while (pEnum->MoveNext() == E_SUCCESS)
+		{
+			int i;
+			pEnum->GetIntAt(0, i);
+
+			LongLong userId(i);
+			if (!pArrayList->Contains(userId))
+			{
+				pArrayList->Add(userId);
+			}
+		}
+
+		delete pEnum;
+		delete pStmt;
+	}
+
+	return pArrayList;
+}
+
+
 //
 // Parsing messages from result
 //
