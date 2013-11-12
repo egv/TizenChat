@@ -119,9 +119,22 @@ TizenChatDialogsTab::OnDataManagerUpdatedUser(int userId)
 }
 
 void
-TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::String errorText)
+TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText)
 {
+    MessageBox messageBox;
+    messageBox.Construct(L"Error", errorText, MSGBOX_STYLE_OK, 3000);
 
+    int modalResult = 0;
+
+    // Calls ShowAndWait() : Draws and Shows itself and processes events
+    messageBox.ShowAndWait(modalResult);
+
+	if (errorCode.ToInt() == INVALID_TOKEN_ERROR_CODE)
+	{
+		AppLogDebug("will forward to login screen");
+		SceneManager* pSceneManager = SceneManager::GetInstance();
+		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_7));
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

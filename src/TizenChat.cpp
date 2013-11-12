@@ -9,6 +9,8 @@
 #include "TizenChat.h"
 #include "TizenChatFrame.h"
 
+#include "DatabaseManager.h"
+
 using namespace Tizen::App;
 using namespace Tizen::Base;
 using namespace Tizen::System;
@@ -60,6 +62,8 @@ TizenChatApp::OnAppInitialized(void)
 	pTizenChatFrame->Construct();
 	pTizenChatFrame->SetName(L"TizenChat");
 	AddFrame(*pTizenChatFrame);
+
+	DatabaseManager::GetInstance().GetLastMessages();
 
 	return true;
 }

@@ -13,7 +13,7 @@ public:
 	virtual void OnDataManagerUpdatedMessages() = 0;
 	virtual void OnDataManagerUpdatedUser(int userId) = 0;
 
-	virtual void OnDataManagerGotError(Tizen::Base::String errorText) = 0;
+	virtual void OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText) = 0;
 };
 
 #endif

@@ -84,10 +84,16 @@ private:
     result SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag);
 
     //
+    // util methods
+    //
+    bool CheckForError(Tizen::Web::Json::JsonObject* pJsonObject, Tizen::Base::LongLong& errorCode, Tizen::Base::String& errorMessage);
+
+    //
     // Notifications
     //
     void NotifyLongPollServerDataUpdated();
     void NotifyMessagesUpdated();
+    void NotifyError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorMessage);
 
     //
     // Parsers

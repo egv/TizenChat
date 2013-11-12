@@ -230,6 +230,25 @@ TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Obje
 	return r;
 }
 
+void
+TizenChatDataManager::NotifyError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorMessage)
+{
+	if (__pListeners == null)
+	{
+		return;
+	}
+
+	IEnumerator* pEnum = __pListeners->GetEnumeratorN();
+	ITizenChatDataManagerEventsListener* pObj = null;
+	while (pEnum->MoveNext() == E_SUCCESS)
+	{
+		pObj = (ITizenChatDataManagerEventsListener*)(pEnum->GetCurrent());
+		pObj->OnDataManagerGotError(errorCode, errorMessage);
+	}
+
+	delete pEnum;
+}
+
 
 void
 TizenChatDataManager::NotifyMessagesUpdated()
@@ -281,6 +300,9 @@ TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
 		__pLongPollServerData = new LongPollServerData();
 	}
 
+	bool hasError;
+	LongLong errorCode;
+	String errorMessage;
 
 	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
 	// The GetHttpStatusCode() method is used to get the HTTP status from the response header.
@@ -300,17 +322,21 @@ TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
 			{
 				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
 
-				IJsonValue *pResponseJsonValue = null;
-				pJsonObject->GetValue(new String(L"response"), pResponseJsonValue);
-
-				JsonObject *pResponseJsonObject = static_cast<JsonObject*>(pResponseJsonValue);
-				result r = __pLongPollServerData->FillWithJsonObject(*pResponseJsonObject);
-
-				if (r != E_SUCCESS)
+				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
+				if (!hasError)
 				{
-					AppLogDebug("error parsing long poll object");
-					delete __pLongPollServerData;
-					__pLongPollServerData = null;
+					IJsonValue *pResponseJsonValue = null;
+					pJsonObject->GetValue(new String(L"response"), pResponseJsonValue);
+
+					JsonObject *pResponseJsonObject = static_cast<JsonObject*>(pResponseJsonValue);
+					result r = __pLongPollServerData->FillWithJsonObject(*pResponseJsonObject);
+
+					if (r != E_SUCCESS)
+					{
+						AppLogDebug("error parsing long poll object");
+						delete __pLongPollServerData;
+						__pLongPollServerData = null;
+					}
 				}
 			}
 
@@ -319,13 +345,20 @@ TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
 		}
 	}
 
-	NotifyLongPollServerDataUpdated();
+	if (hasError)
+	{
+		NotifyError(errorCode, errorMessage);
+	}
+	else
+	{
+		NotifyLongPollServerDataUpdated();
+	}
 }
 
 void
 TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 {
-	AppLogDebug("hit parse logn poll history");
+	AppLogDebug("hit parse long poll history");
 	getDialogsRequestRunning = false;
 
 	if (__pLastMessages == null)
@@ -334,6 +367,9 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 		__pLastMessages->Construct();
 	}
 
+	bool hasError;
+	LongLong errorCode;
+	String errorMessage;
 
 	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
 	// The GetHttpStatusCode() method is used to get the HTTP status from the response header.
@@ -353,35 +389,39 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 			{
 				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
 
-				IJsonValue *pJsonArrayValue = null;
-				result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/messages/items"), pJsonArrayValue);
-				if (r == E_SUCCESS)
+				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
+				if (!hasError)
 				{
-					JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
-
-					IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
-					if(pEnum)
+					IJsonValue *pJsonArrayValue = null;
+					result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/messages/items"), pJsonArrayValue);
+					if (r == E_SUCCESS)
 					{
-						while( pEnum->MoveNext() == E_SUCCESS )
-						{
-							IJsonValue* pJsonValue = null;
-							//Uses the pJsonValue
-							pEnum->GetCurrent(pJsonValue);
-							JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+						JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
 
-							Message* pMessage = new Message();
-							result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
-							if (r == E_SUCCESS)
+						IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
+						if(pEnum)
+						{
+							while( pEnum->MoveNext() == E_SUCCESS )
 							{
-								__pLastMessages->Add(*pMessage);
+								IJsonValue* pJsonValue = null;
+								//Uses the pJsonValue
+								pEnum->GetCurrent(pJsonValue);
+								JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+
+								Message* pMessage = new Message();
+								result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
+								if (r == E_SUCCESS)
+								{
+									__pLastMessages->Add(*pMessage);
+								}
 							}
+							delete pEnum;
 						}
-						delete pEnum;
 					}
-				}
-				else
-				{
-					AppLogDebug("failed to get array at correct path");
+					else
+					{
+						AppLogDebug("failed to get array at correct path");
+					}
 				}
 			}
 
@@ -392,7 +432,14 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 		}
 	}
 
-	NotifyMessagesUpdated();
+	if (hasError)
+	{
+		NotifyError(errorCode, errorMessage);
+	}
+	else
+	{
+		NotifyMessagesUpdated();
+	}
 }
 
 void
@@ -407,6 +454,9 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 		__pLastMessages->Construct();
 	}
 
+	bool hasError;
+	LongLong errorCode;
+	String errorMessage;
 
 	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
 	// The GetHttpStatusCode() method is used to get the HTTP status from the response header.
@@ -426,38 +476,41 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 			{
 				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
 
-				IJsonValue *pJsonArrayValue = null;
-				result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/items"), pJsonArrayValue);
-				if (r == E_SUCCESS)
+				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
+				if (!hasError)
 				{
-					JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
-
-					IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
-					if(pEnum)
+					IJsonValue *pJsonArrayValue = null;
+					result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/items"), pJsonArrayValue);
+					if (r == E_SUCCESS)
 					{
-						while( pEnum->MoveNext() == E_SUCCESS )
-						{
-							IJsonValue* pJsonValue = null;
-							//Uses the pJsonValue
-							pEnum->GetCurrent(pJsonValue);
-							JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+						JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
 
-							Message* pMessage = new Message();
-							result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
-							if (r == E_SUCCESS)
+						IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
+						if(pEnum)
+						{
+							while( pEnum->MoveNext() == E_SUCCESS )
 							{
-								__pLastMessages->Add(*pMessage);
+								IJsonValue* pJsonValue = null;
+								//Uses the pJsonValue
+								pEnum->GetCurrent(pJsonValue);
+								JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+
+								Message* pMessage = new Message();
+								result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
+								if (r == E_SUCCESS)
+								{
+									__pLastMessages->Add(*pMessage);
+								}
 							}
+							delete pEnum;
 						}
-						delete pEnum;
+					}
+					else
+					{
+						AppLogDebug("failed to get array at correct path");
 					}
 				}
-				else
-				{
-					AppLogDebug("failed to get array at correct path");
-				}
 			}
-
 			delete pBuffer;
 			delete pJsonValue;
 
@@ -465,7 +518,14 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 		}
 	}
 
-	NotifyMessagesUpdated();
+	if (hasError)
+	{
+		NotifyError(errorCode, errorMessage);
+	}
+	else
+	{
+		NotifyMessagesUpdated();
+	}
 }
 
 void
@@ -473,3 +533,24 @@ TizenChatDataManager::ParseUser()
 {
 
 }
+
+bool
+TizenChatDataManager::CheckForError(Tizen::Web::Json::JsonObject* pJsonObject, Tizen::Base::LongLong& errorCode, Tizen::Base::String& errorMessage)
+{
+	bool hasKey;
+	String* key = new String(L"error");
+
+	pJsonObject->ContainsKey(key, hasKey);
+	if (hasKey)
+	{
+		IJsonValue* __pJsonValue = null;
+		pJsonObject->GetValue(key, __pJsonValue);
+
+		JsonObject *__pJsonObject = static_cast<JsonObject*>(__pJsonValue);
+		Utils::getInstance().LongLongFromJsonObject(*__pJsonObject, String(L"error_code"), true, errorCode);
+		Utils::getInstance().StringFromJsonObject(*__pJsonObject, String(L"error_msg"), true, errorMessage);
+	}
+
+	return hasKey;
+}
+

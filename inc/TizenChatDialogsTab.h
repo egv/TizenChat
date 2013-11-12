@@ -40,7 +40,7 @@ public:
 	virtual void OnDataManagerUpdatedLongPollServerData();
 	virtual void OnDataManagerUpdatedMessages();
 	virtual void OnDataManagerUpdatedUser(int userId);
-	virtual void OnDataManagerGotError(Tizen::Base::String errorText);
+	virtual void OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText);
 
 	//
 	// table stuff
@@ -54,6 +54,8 @@ public:
 	virtual float GetDefaultItemHeightF(void);
 
 private:
+	static const int INVALID_TOKEN_ERROR_CODE = 5;
+
 	void LoadChatHistory();
 };
 
