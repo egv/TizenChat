@@ -11,6 +11,7 @@
 #include <FBase.h>
 #include <FIo.h>
 
+#include "User.h"
 #include "Message.h"
 
 class DatabaseManager
@@ -25,8 +26,11 @@ public:
 
     Tizen::Base::Collection::ArrayList* GetLastMessages(void);
     Tizen::Base::Collection::ArrayList* GetChatMessages(int chatId);
-
     void SaveOrUpdateMessage(Message* pMessage);
+    void SaveOrUpdateMessages(Tizen::Base::Collection::ArrayList* pMessageList);
+
+    void SaveOrUpdateUser(User *pUser);
+    Tizen::Base::Collection::ArrayList* GetUnknownUsers();
 
 private:
 	Tizen::Io::Database* __pDatabase;
@@ -39,7 +43,6 @@ private:
     DatabaseManager(DatabaseManager const&);              // Don't Implement
     void operator=(DatabaseManager const&);               // Don't implement
 
-    Tizen::Base::Collection::ArrayList* GetUnknownUsers();
     Message *GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
 };
 

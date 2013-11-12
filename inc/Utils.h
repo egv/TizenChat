@@ -31,7 +31,7 @@ class Utils
         String *accessToken();
         void setAccessToken(const String& acessToken);
 
-        result JoinNumbersArrayList(Tizen::Base::Collection::ArrayList arr, Tizen::Base::String& str);
+        result JoinNumbersArrayList(Tizen::Base::Collection::ArrayList* arr, Tizen::Base::String& str);
 
         result JsonValueAtPath(Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& path, Tizen::Web::Json::IJsonValue*& jsonValue);
 

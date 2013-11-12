@@ -9,11 +9,14 @@
 #include <FNet.h>
 #include <FWebJson.h>
 
-#include "ITizenChatDatamanagerEventsListener.h"
+#include "ITizenChatDataManagerEventsListener.h"
 #include "TizenChatDataManager.h"
 #include "Utils.h"
-#include "Message.h"
 #include "DatabaseManager.h"
+
+#include "Message.h"
+#include "User.h"
+
 
 const static wchar_t* HTTP_CLIENT_HOST_ADDRESS = L"https://api.vk.com";
 
@@ -74,7 +77,7 @@ TizenChatDataManager::LoadLongPollHistory()
 		return;
 
 	getDialogsRequestRunning = true;
-	String url(L"https://api.vk.com/method/messages.getLongPollHistory?v=5.2&max_msg_id=1&msgs_limit=200&ts=");
+	String url(L"https://api.vk.com/method/messages.getLongPollHistory?v=5.3&max_msg_id=1&msgs_limit=200&ts=");
 	url.Append(__pLongPollServerData->ts.ToString());
 	url.Append("&access_token=");
 	url.Append(*(Utils::getInstance().accessToken()));
@@ -98,7 +101,7 @@ TizenChatDataManager::LoadLastMessages()
 		return;
 
 	getDialogsRequestRunning = true;
-	String url(L"https://api.vk.com/method/messages.getDialogs?v=5.2&count=200&access_token=");
+	String url(L"https://api.vk.com/method/messages.getDialogs?v=5.3&count=200&access_token=");
 	url.Append(*(Utils::getInstance().accessToken()));
 
 	result r = SendGetRequest(url, new Integer(GET_DIALOGS_REQUEST_TAG));
@@ -118,7 +121,7 @@ TizenChatDataManager::ObtainLongPollServerData()
 		return;
 
 	__getLongPollServerDataRequest = true;
-	String url(L"https://api.vk.com/method/messages.getLongPollServer?v=5.2&access_token=");
+	String url(L"https://api.vk.com/method/messages.getLongPollServer?v=5.3&access_token=");
 	url.Append(*(Utils::getInstance().accessToken()));
 
 	result r = SendGetRequest(url, new Integer(GET_LONG_POLL_SERVER_DATA_REQUEST_TAG));
@@ -129,6 +132,29 @@ TizenChatDataManager::ObtainLongPollServerData()
 		__getLongPollServerDataRequest = false;
 	}
 }
+
+void
+TizenChatDataManager::LoadUsers(Tizen::Base::Collection::ArrayList* userIds)
+{
+	String url(L"https://api.vk.com/method/users.get?v=5.3&user_ids=");
+
+	String userIdsStr;
+	Utils::getInstance().JoinNumbersArrayList(userIds, userIdsStr);
+
+	url.Append(userIdsStr);
+	url.Append(L"name_case=Nom&fields=sex,online,photo_medium,photo_medium_rec");
+	url.Append(L"&access_token=");
+	url.Append(*(Utils::getInstance().accessToken()));
+
+	result r = SendGetRequest(url, new Integer(USERS_GET_REQUEST_TAG));
+
+	if (r != E_SUCCESS)
+	{
+		AppLogDebug("error sending request to get users");
+	}
+}
+
+
 
 LongPollServerData*
 TizenChatDataManager::GetLongPollServerData()
@@ -362,12 +388,6 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 	AppLogDebug("hit parse long poll history");
 	getDialogsRequestRunning = false;
 
-	if (__pLastMessages == null)
-	{
-		__pLastMessages = new ArrayList();
-		__pLastMessages->Construct();
-	}
-
 	bool hasError;
 	LongLong errorCode;
 	String errorMessage;
@@ -389,12 +409,55 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 			if (pJsonValue->GetType() == JSON_TYPE_OBJECT)
 			{
 				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
+				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
+				if (!hasError)
+				{
+					ArrayList* pMessageList = ParseMessagesFromJsonPath(pJsonObject, String(L"response/messages/items"));
+					DatabaseManager::GetInstance().SaveOrUpdateMessages(pMessageList);
+				}
+			}
+
+			delete pBuffer;
+			delete pJsonValue;
+		}
+	}
+
+	if (hasError)
+	{
+		NotifyError(errorCode, errorMessage);
+	}
+	else
+	{
+		NotifyMessagesUpdated();
+	}
+}
+
+void
+TizenChatDataManager::ParseUsersGetData(HttpTransaction &httpTransaction)
+{
+	bool hasError;
+	LongLong errorCode;
+	String errorMessage;
+
+	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
+	AppLogDebug("http response status code: %d", pHttpResponse->GetHttpStatusCode());
+	if (pHttpResponse->GetHttpStatusCode() == HTTP_STATUS_OK)
+	{
+		HttpHeader* pHttpHeader = pHttpResponse->GetHeader();
+		if (pHttpHeader != null)
+		{
+			ByteBuffer* pBuffer = pHttpResponse->ReadBodyN();
+
+			IJsonValue *pJsonValue = JsonParser::ParseN(*pBuffer);
+			if (pJsonValue->GetType() == JSON_TYPE_OBJECT)
+			{
+				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
 
 				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
 				if (!hasError)
 				{
 					IJsonValue *pJsonArrayValue = null;
-					result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/messages/items"), pJsonArrayValue);
+					result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response"), pJsonArrayValue);
 					if (r == E_SUCCESS)
 					{
 						JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
@@ -409,13 +472,11 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 								pEnum->GetCurrent(pJsonValue);
 								JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
 
-								Message* pMessage = new Message();
-								result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
-								// FIXME: add them as a bunch in one transaction
+								User* pUser = new User();
+								result r = pUser->FillWithJsonObject(*pJsonMessageObject);
 								if (r == E_SUCCESS)
 								{
-									DatabaseManager::GetInstance().SaveOrUpdateMessage(pMessage);
-									__pLastMessages->Add(*pMessage);
+									DatabaseManager::GetInstance().SaveOrUpdateUser(pUser);
 								}
 							}
 
@@ -428,11 +489,8 @@ TizenChatDataManager::ParseLongPollHistory(HttpTransaction &httpTransaction)
 					}
 				}
 			}
-
 			delete pBuffer;
 			delete pJsonValue;
-
-			AppLogDebug("total messages received: %d", __pLastMessages->GetCount());
 		}
 	}
 
@@ -452,12 +510,6 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 	AppLogDebug("hit parse messages");
 	getDialogsRequestRunning = false;
 
-	if (__pLastMessages == null)
-	{
-		__pLastMessages = new ArrayList();
-		__pLastMessages->Construct();
-	}
-
 	bool hasError;
 	LongLong errorCode;
 	String errorMessage;
@@ -483,43 +535,12 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
 				if (!hasError)
 				{
-					IJsonValue *pJsonArrayValue = null;
-					result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/items"), pJsonArrayValue);
-					if (r == E_SUCCESS)
-					{
-						JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
-
-						IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
-						if(pEnum)
-						{
-							while( pEnum->MoveNext() == E_SUCCESS )
-							{
-								IJsonValue* pJsonValue = null;
-								//Uses the pJsonValue
-								pEnum->GetCurrent(pJsonValue);
-								JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
-
-								Message* pMessage = new Message();
-								result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
-								if (r == E_SUCCESS)
-								{
-									DatabaseManager::GetInstance().SaveOrUpdateMessage(pMessage);
-									__pLastMessages->Add(*pMessage);
-								}
-							}
-							delete pEnum;
-						}
-					}
-					else
-					{
-						AppLogDebug("failed to get array at correct path");
-					}
+					ArrayList* pMessageList = ParseMessagesFromJsonPath(pJsonObject, String(L"response/items"));
+					DatabaseManager::GetInstance().SaveOrUpdateMessages(pMessageList);
 				}
 			}
 			delete pBuffer;
 			delete pJsonValue;
-
-			AppLogDebug("total messages received: %d", __pLastMessages->GetCount());
 		}
 	}
 
@@ -529,6 +550,14 @@ TizenChatDataManager::ParseMessages(HttpTransaction &httpTransaction)
 	}
 	else
 	{
+		ArrayList* pMissigUserIds = DatabaseManager::GetInstance().GetUnknownUsers();
+		if (pMissigUserIds->GetCount() > 0)
+		{
+			LoadUsers(pMissigUserIds);
+		}
+
+		delete pMissigUserIds;
+
 		NotifyMessagesUpdated();
 	}
 }
@@ -557,5 +586,46 @@ TizenChatDataManager::CheckForError(Tizen::Web::Json::JsonObject* pJsonObject, T
 	}
 
 	return hasKey;
+}
+
+Tizen::Base::Collection::ArrayList*
+TizenChatDataManager::ParseMessagesFromJsonPath(Tizen::Web::Json::JsonObject* pJsonObject, Tizen::Base::String path)
+{
+	ArrayList* pArrayList = new ArrayList();
+	pArrayList->Construct(200);
+
+	IJsonValue *pJsonArrayValue = null;
+	result r = Utils::getInstance().JsonValueAtPath(*pJsonObject, String(L"response/items"), pJsonArrayValue);
+	if (r == E_SUCCESS)
+	{
+		JsonArray *pJsonArray = static_cast<JsonArray*>(pJsonArrayValue);
+
+		IEnumeratorT<IJsonValue*>* pEnum = pJsonArray->GetEnumeratorN();
+		if(pEnum)
+		{
+			while( pEnum->MoveNext() == E_SUCCESS )
+			{
+				IJsonValue* pJsonValue = null;
+				//Uses the pJsonValue
+				pEnum->GetCurrent(pJsonValue);
+				JsonObject *pJsonMessageObject = static_cast<JsonObject*>(pJsonValue);
+
+				Message* pMessage = new Message();
+				result r = pMessage->FillWithJsonObject(*pJsonMessageObject);
+				if (r == E_SUCCESS)
+				{
+					pArrayList->Add(pMessage);
+				}
+			}
+
+			delete pEnum;
+		}
+	}
+	else
+	{
+		AppLogDebug("failed to get array at correct path");
+	}
+
+	return pArrayList;
 }
 
