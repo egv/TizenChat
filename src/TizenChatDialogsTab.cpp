@@ -7,6 +7,7 @@
 
 #include "DatabaseManager.h"
 #include "Message.h"
+#include "ImagesManager.h"
 
 using namespace Tizen::Graphics;
 using namespace Tizen::Ui;
@@ -171,10 +172,22 @@ TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
 
     Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
 
-    Label* pLabel = new Label();
-    pLabel->Construct(Rectangle(0, 0, itemWidth, GetDefaultItemHeight()), pMessage->body);
 
-    pItem->AddControl(pLabel);
+    // this is avatar
+    Label* pAvatarLabel = new Label();
+    pAvatarLabel->Construct(Rectangle(0, 0, GetDefaultItemHeight(), GetDefaultItemHeight()), L"");
+    pAvatarLabel->SetBackgroundBitmap(*(ImagesManager::GetInstance().GetBitmapForUrl(null, 108, 108, null, null)));
+    pItem->AddControl(pAvatarLabel);
+
+    int textLabelHeight = 45;
+    int textSize = 35;
+    Label* pTextLabel = new Label();
+    pTextLabel->Construct(Rectangle(GetDefaultItemHeight(), GetDefaultItemHeight() - textLabelHeight - 5, itemWidth - GetDefaultItemHeight(), textLabelHeight), pMessage->body);
+    pTextLabel->SetTextConfig(textSize, LABEL_TEXT_STYLE_NORMAL);
+    pTextLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
+    pTextLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
+
+    pItem->AddControl(pTextLabel);
 
     return pItem;
 }
@@ -207,7 +220,7 @@ TizenChatDialogsTab::GetDefaultItemHeight(void)
 {
 	// TODO: Add your implementation codes here
 
-	return 100;
+	return 108;
 
 }
 
@@ -216,7 +229,7 @@ TizenChatDialogsTab::GetDefaultItemHeightF(void)
 {
 	// TODO: Add your implementation codes here
 
-	return 100.0f;
+	return 108.0f;
 
 }
 

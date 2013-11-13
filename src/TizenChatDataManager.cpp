@@ -177,6 +177,10 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 		ParseLongPollServerData(httpTransaction);
 		break;
 
+	case USERS_GET_REQUEST_TAG:
+		ParseUsersGetData(httpTransaction);
+		break;
+
 	default:
 		AppLogDebug("unknown operation: %d", opCode);
 		break;
@@ -469,6 +473,7 @@ TizenChatDataManager::ParseUsersGetData(HttpTransaction &httpTransaction)
 								result r = pUser->FillWithJsonObject(*pJsonMessageObject);
 								if (r == E_SUCCESS)
 								{
+									AppLogDebug("got user id: %d, name: %S %S", pUser->id.ToInt(), pUser->firstName.GetPointer(), pUser->lastName.GetPointer());
 									DatabaseManager::GetInstance().SaveOrUpdateUser(pUser);
 								}
 							}

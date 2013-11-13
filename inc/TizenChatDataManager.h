@@ -58,7 +58,7 @@ private:
 	static const int GET_LONG_POLL_SERVER_DATA_REQUEST_TAG = 100;
 	static const int GET_DIALOGS_REQUEST_TAG = 101;
 	static const int GET_LONG_POLL_HISTORY_REQUEST_TAG = 102;
-	static const int USERS_GET_REQUEST_TAG = 102;
+	static const int USERS_GET_REQUEST_TAG = 103;
 
 
 	LongPollServerData* __pLongPollServerData;

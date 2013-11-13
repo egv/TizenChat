@@ -204,10 +204,20 @@ Utils::JsonValueAtPath(Tizen::Web::Json::JsonObject& object, const Tizen::Base::
 		String token;
 		tok.GetNextToken(token);
 
+		AppLogDebug("getting json elt at path %S", token.GetPointer());
+
 		IJsonValue* __pJsonValue = null;
 		JsonObject* __pJsonObject = jsonValue == null ? &object : static_cast<JsonObject*>(jsonValue);
-		__pJsonObject->GetValue(new String(token), __pJsonValue);
+
+		bool hasItem;
+		String *key = new String(token);
+		__pJsonObject->ContainsKey(key, hasItem);
+		TryReturn(hasItem, E_FAILURE, "no item %S in path", token.GetPointer());
+
+		__pJsonObject->GetValue(key, __pJsonValue);
 		jsonValue = __pJsonValue;
+
+		delete key;
 	}
 
 	return r;
@@ -223,6 +233,7 @@ Utils::JoinNumbersArrayList(Tizen::Base::Collection::ArrayList* arr, Tizen::Base
 	if (arr->GetCount() > 0)
 	{
 		Number *number = static_cast<Number*>(arr->GetAt(0));
+		AppLogDebug("number: %S", number->ToString().GetPointer());
 		str.Append(number->ToString());
 		for (int i=1; i < arr->GetCount(); i++)
 		{
