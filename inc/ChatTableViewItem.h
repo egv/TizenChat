@@ -17,7 +17,15 @@ class ChatTableViewItem: public Tizen::Ui::Controls::TableViewItem
 {
 public:
 	result Construct (const Tizen::Graphics::Dimension &itemSize);
-	virtual void FillWithMessage(Message* pMessage) = 0;
+	void FillWithMessage(Message* pMessage);
+
+protected:
+	Tizen::Ui::Controls::Label* _pAvatarLabel;
+	Tizen::Ui::Controls::Label* _pTitleLabel;
+	Tizen::Ui::Controls::Label* _pTextLabel;
+	Tizen::Ui::Controls::Label* _pTimeLabel;
+	Tizen::Ui::Controls::Label* _pNameLabel;
+
 };
 
 #endif /* CHATTABLEVIEWITEM_H_ */

@@ -7,7 +7,7 @@
 
 #include "DatabaseManager.h"
 #include "Message.h"
-#include "ImagesManager.h"
+#include "ChatTableViewItem.h"
 
 using namespace Tizen::Graphics;
 using namespace Tizen::Ui;
@@ -167,27 +167,12 @@ TizenChatDialogsTab::GetItemCount(void)
 TableViewItem*
 TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
 {
-	TableViewItem* pItem = new TableViewItem();
-    pItem->Construct(Dimension(itemWidth, GetDefaultItemHeight()), TABLE_VIEW_ANNEX_STYLE_NORMAL);
+	ChatTableViewItem* pItem = new ChatTableViewItem;
+    pItem->Construct(Dimension(itemWidth, GetDefaultItemHeight()));
 
     Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
 
-
-    // this is avatar
-    Label* pAvatarLabel = new Label();
-    pAvatarLabel->Construct(Rectangle(0, 0, GetDefaultItemHeight(), GetDefaultItemHeight()), L"");
-    pAvatarLabel->SetBackgroundBitmap(*(ImagesManager::GetInstance().GetBitmapForUrl(null, 108, 108, null, null)));
-    pItem->AddControl(pAvatarLabel);
-
-    int textLabelHeight = 45;
-    int textSize = 35;
-    Label* pTextLabel = new Label();
-    pTextLabel->Construct(Rectangle(GetDefaultItemHeight(), GetDefaultItemHeight() - textLabelHeight - 5, itemWidth - GetDefaultItemHeight(), textLabelHeight), pMessage->body);
-    pTextLabel->SetTextConfig(textSize, LABEL_TEXT_STYLE_NORMAL);
-    pTextLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
-    pTextLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
-
-    pItem->AddControl(pTextLabel);
+    pItem->FillWithMessage(pMessage);
 
     return pItem;
 }
@@ -212,7 +197,9 @@ TizenChatDialogsTab::DeleteItem(int itemIndex, TableViewItem* pItem)
 void
 TizenChatDialogsTab::UpdateItem(int itemIndex, TableViewItem* pItem)
 {
-	// TODO: Add your implementation codes here
+	ChatTableViewItem* pChatItem = static_cast<ChatTableViewItem*>(pItem);
+    Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
+    pChatItem->FillWithMessage(pMessage);
 }
 
 int

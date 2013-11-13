@@ -47,19 +47,7 @@ ImagesManager::GetBitmapForUrl(Tizen::Base::String url,
 
     if (pAppResource)
     {
-        Bitmap* pBitmap = pAppResource->GetBitmapN(L"no_photo_user.png", BITMAP_PIXEL_FORMAT_ARGB8888);
-    	Bitmap* pMaskBitmap = pAppResource->GetBitmapN(L"thumbnail_list.png", BITMAP_PIXEL_FORMAT_ARGB8888);
-
-    	if (pBitmap)
-        {
-    		Canvas *pCanvas = new Canvas();
-    		pCanvas->Construct(Rectangle(0, 0, 108, 108));
-    		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
-    		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
-
-    		result = new Bitmap();
-    		result->Construct(*pCanvas, Rectangle(0, 0, 108, 108));
-        }
+        result = pAppResource->GetBitmapN(L"no_photo_user.png", BITMAP_PIXEL_FORMAT_ARGB8888);
     }
 
     return result;
