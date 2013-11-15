@@ -38,6 +38,7 @@ public:
 private:
     Tizen::Base::String __cacheDirName;
     Tizen::Media::Image* __pImage;
+    Tizen::Base::Collection::Queue* __pRequestsQueue;
     Tizen::Base::Collection::HashMap* __pUserInfoHashMap;
     Tizen::Base::Collection::HashMap* __pListenersHashMap;
 

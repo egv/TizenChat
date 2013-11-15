@@ -53,7 +53,9 @@ ChatTableViewItem::Construct (const Tizen::Graphics::Dimension &itemSize)
 	AddControl(_pTextLabel);
 	pRelativeLayout->SetRelation(*_pTextLabel, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
 	pRelativeLayout->SetRelation(*_pTextLabel, _pAvatarLabel, RECT_EDGE_RELATION_LEFT_TO_RIGHT);
+//	pRelativeLayout->SetRelation(*_pTextLabel, this, RECT_EDGE_RELATION_LEFT_TO_LEFT);
 	pRelativeLayout->SetRelation(*_pTextLabel, this, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
+//	pRelativeLayout->SetMargin(*_pTextLabel, 108, 0, 0, 0);
     _pTextLabel->SetTextConfig(35, LABEL_TEXT_STYLE_NORMAL);
     _pTextLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
     _pTextLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
@@ -66,6 +68,7 @@ ChatTableViewItem::SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap)
 {
 	if (pBitmap == null)
 	{
+		AppLogDebug("trying to set empty avatar");
 		return;
 	}
 
@@ -73,16 +76,23 @@ ChatTableViewItem::SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap)
 	Bitmap* pMaskBitmap = Utils::getInstance().GetBitmapWithName(String(L"thumbnail_list.png"));
 	if (pMaskBitmap)
 	{
-		Canvas *pCanvas = new Canvas();
+		Canvas *pCanvas = new Canvas;
 		pCanvas->Construct(Rectangle(0, 0, 108, 108));
 		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
 		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
 
 		result = new Bitmap();
 		result->Construct(*pCanvas, Rectangle(0, 0, 108, 108));
+
+		delete pCanvas;
 	}
 
+	delete pBitmap;
+	delete pMaskBitmap;
+
 	_pAvatarLabel->SetBackgroundBitmap(*result);
+	_pAvatarLabel->Draw();
+	//delete result;
 }
 
 void

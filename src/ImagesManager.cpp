@@ -48,6 +48,9 @@ ImagesManager::ImagesManager()
 
 	__pUserInfoHashMap = new HashMap;
 	__pUserInfoHashMap->Construct();
+
+	__pRequestsQueue = new Queue;
+	__pRequestsQueue->Construct();
 }
 
 
@@ -84,10 +87,25 @@ ImagesManager::GetBitmapForUrl(const Tizen::Base::String url,
 		Uri uri;
 		uri.SetUri(url);
 
-		__pImage->DecodeUrl(uri, BITMAP_PIXEL_FORMAT_ARGB8888, 108, 108, reqId, *this, 60000);
+		result r = __pImage->DecodeUrl(uri, BITMAP_PIXEL_FORMAT_ARGB8888, 108, 108, reqId, *this, 60000);
+		if (!IsFailed(r))
+		{
+			AppLogDebug("request id: %d", reqId);
 
-		__pListenersHashMap->Add(new Integer(reqId), listener);
-		__pUserInfoHashMap->Add(new Integer(reqId), ConstructRequestHashMap(fullFileName, userInfo));
+			Integer* pKey = new Integer(reqId);
+			__pListenersHashMap->Add(pKey, listener);
+			__pUserInfoHashMap->Add(pKey, ConstructRequestHashMap(fullFileName, userInfo));
+		}
+		else
+		{
+			HashMap* pHashMap = new HashMap;
+			pHashMap->Construct();
+
+			pHashMap->Add(new String(L"listener"), listener);
+			pHashMap->Add(new String(L"url"), new String(url));
+			pHashMap->Add(new String(L"userInfo"), userInfo);
+			__pRequestsQueue->Enqueue(pHashMap);
+		}
 	}
 
     return pBitmap;
@@ -178,6 +196,17 @@ ImagesManager::OnImageDecodeUrlReceived(RequestId reqId, Tizen::Graphics::Bitmap
 		{
 			listener->OnImageManagerDownloadFailed(userInfo);
 		}
+	}
+
+	// get next request from the queue
+	HashMap* pHashMap = static_cast<HashMap*>(__pRequestsQueue->Dequeue());
+	if (pHashMap != null)
+	{
+		IImagesManagerDelegate* listener = static_cast<IImagesManagerDelegate*>(pHashMap->GetValue(String(L"listener")));
+		String* url = static_cast<String*>(pHashMap->GetValue(String(L"url")));
+		HashMap* userInfo = static_cast<HashMap*>(pHashMap->GetValue(String(L"userInfo")));;
+
+		GetBitmapForUrl(*url, listener, userInfo);
 	}
 }
 

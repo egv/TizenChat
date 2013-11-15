@@ -263,7 +263,6 @@ TizenChatDialogsTab::GetDefaultItemHeightF(void)
 void
 TizenChatDialogsTab::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, Tizen::Base::Collection::HashMap* userInfo)
 {
-	AppLogDebug("got success for loading image");
 	if (userInfo == null)
 	{
 		return;
@@ -277,6 +276,7 @@ TizenChatDialogsTab::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBit
 	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
 	if(pTableview1)
 	{
+		AppLogDebug("got success for loading image for row %d, row count: %d", rowNumber->ToInt(), pTableview1->GetItemCount());
 		if (rowNumber->ToInt() < pTableview1->GetItemCount())
 		{
 			pTableview1->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
