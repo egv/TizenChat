@@ -7,6 +7,7 @@
 
 #include "DatabaseManager.h"
 #include "Message.h"
+#include "ImagesManager.h"
 #include "ChatTableViewItem.h"
 
 using namespace Tizen::Graphics;
@@ -134,19 +135,21 @@ TizenChatDialogsTab::OnDataManagerUpdatedUser(int userId)
 void
 TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText)
 {
-    MessageBox messageBox;
-    messageBox.Construct(L"Error", errorText, MSGBOX_STYLE_OK, 3000);
-
-    int modalResult = 0;
-
-    // Calls ShowAndWait() : Draws and Shows itself and processes events
-    messageBox.ShowAndWait(modalResult);
-
 	if (errorCode.ToInt() == INVALID_TOKEN_ERROR_CODE)
 	{
 		AppLogDebug("will forward to login screen");
 		SceneManager* pSceneManager = SceneManager::GetInstance();
 		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_7));
+	}
+	else
+	{
+	    MessageBox messageBox;
+	    messageBox.Construct(L"Error", errorText, MSGBOX_STYLE_OK, 3000);
+
+	    int modalResult = 0;
+
+	    // Calls ShowAndWait() : Draws and Shows itself and processes events
+	    messageBox.ShowAndWait(modalResult);
 	}
 }
 
@@ -171,6 +174,26 @@ TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
     pItem->Construct(Dimension(itemWidth, GetDefaultItemHeight()));
 
     Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
+
+    User *pUser = DatabaseManager::GetInstance().GetUserById(pMessage->userId);
+
+    if (pUser != null)
+    {
+    	AppLogDebug("found user with id: %d", pMessage->userId.ToInt());
+    	pUser->Log();
+        HashMap* pHashMap = new HashMap;
+        pHashMap->Construct();
+        pHashMap->Add(new String(L"rowNumber"), new Integer(itemIndex));
+        AppLogDebug("will avatar info for user %d from url %S", pUser->id.ToInt(), pUser->photoMediumRec.GetPointer());
+        pItem->SetUserAvatar(ImagesManager::GetInstance().GetBitmapForUrl(pUser->photoMediumRec, this, pHashMap));
+        delete pUser;
+    }
+    else
+    {
+    	AppLogDebug("can not find user with id: %d", pMessage->userId.ToInt());
+        pItem->SetUserAvatar(ImagesManager::GetInstance().GetUnknownAvatar());
+    }
+
 
     pItem->FillWithMessage(pMessage);
 
@@ -199,25 +222,73 @@ TizenChatDialogsTab::UpdateItem(int itemIndex, TableViewItem* pItem)
 {
 	ChatTableViewItem* pChatItem = static_cast<ChatTableViewItem*>(pItem);
     Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
+
+    User *pUser = DatabaseManager::GetInstance().GetUserById(pMessage->userId);
+
+    if (pUser != null)
+    {
+    	AppLogDebug("found user with id: %d", pMessage->userId.ToInt());
+    	pUser->Log();
+        HashMap* pHashMap = new HashMap;
+        pHashMap->Construct();
+        pHashMap->Add(new String(L"rowNumber"), new Integer(itemIndex));
+        AppLogDebug("will avatar info for user %d from url %S", pUser->id.ToInt(), pUser->photoMediumRec.GetPointer());
+        pChatItem->SetUserAvatar(ImagesManager::GetInstance().GetBitmapForUrl(pUser->photoMediumRec, this, pHashMap));
+        delete pUser;
+    }
+    else
+    {
+    	AppLogDebug("can not find user with id: %d", pMessage->userId.ToInt());
+        pChatItem->SetUserAvatar(ImagesManager::GetInstance().GetUnknownAvatar());
+    }
+
     pChatItem->FillWithMessage(pMessage);
 }
 
 int
 TizenChatDialogsTab::GetDefaultItemHeight(void)
 {
-	// TODO: Add your implementation codes here
-
 	return 108;
-
 }
 
 float
 TizenChatDialogsTab::GetDefaultItemHeightF(void)
 {
-	// TODO: Add your implementation codes here
-
 	return 108.0f;
+}
 
+//
+// Image manager stuff
+//
+void
+TizenChatDialogsTab::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, Tizen::Base::Collection::HashMap* userInfo)
+{
+	AppLogDebug("got success for loading image");
+	if (userInfo == null)
+	{
+		return;
+	}
+
+	Integer* listenerTag = null;
+	Integer* rowNumber = null;
+
+	rowNumber = static_cast<Integer*>(userInfo->GetValue(String(L"rowNumber")));
+
+	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
+	if(pTableview1)
+	{
+		if (rowNumber->ToInt() < pTableview1->GetItemCount())
+		{
+			pTableview1->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
+		}
+	}
+}
+
+void
+TizenChatDialogsTab::OnImageManagerDownloadFailed(Tizen::Base::Collection::HashMap* userInfo)
+{
+	// doing nothing now
+	AppLogDebug("got failure for loading image");
 }
 
 //

@@ -16,7 +16,11 @@
 class ChatTableViewItem: public Tizen::Ui::Controls::TableViewItem
 {
 public:
+	int tag;
+
 	result Construct (const Tizen::Graphics::Dimension &itemSize);
+
+	void SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap);
 	void FillWithMessage(Message* pMessage);
 
 protected:

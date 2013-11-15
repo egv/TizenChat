@@ -14,6 +14,13 @@
 using namespace Tizen::Base;
 using namespace Tizen::Web::Json;
 
+void
+User::Log(void)
+{
+	AppLogDebug("user {\n\tid: %d\n\tfirst_name: %S\n\tlast_name: %S\n\tscreen_name: %S\n\tphoto; %S\n\tphoto_m_r: %S\n\tsex: %d\n\tonline: %d\n}",
+			id.ToInt(), firstName.GetPointer(), lastName.GetPointer(), screenName.GetPointer(), photo.GetPointer(), photoMediumRec.GetPointer(), sex.ToInt(), online.ToInt());
+}
+
 result
 User::FillWithJsonObject(const Tizen::Web::Json::JsonObject& object)
 {
@@ -42,7 +49,7 @@ User::FillWithJsonObject(const Tizen::Web::Json::JsonObject& object)
 	r = Utils::getInstance().StringFromJsonObject(object, String(L"last_name"), true, lastName);
 	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "unable to get last name");
 
-	r = Utils::getInstance().StringFromJsonObject(object, String(L"screen_name"), true, screenName);
+	r = Utils::getInstance().StringFromJsonObject(object, String(L"screen_name"), false, screenName);
 	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "unable to get screen name");
 
 	r = Utils::getInstance().StringFromJsonObject(object, String(L"photo_medium"), true, photo);

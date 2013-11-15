@@ -9,6 +9,7 @@
 #include <FGraphics.h>
 #include <gl.h>
 
+#include "IImagesManagerDelegate.h"
 #include "ITizenChatDataManagerEventsListener.h"
 
 class TizenChatDialogsTab
@@ -16,6 +17,7 @@ class TizenChatDialogsTab
 	, public Tizen::Ui::Scenes::ISceneEventListener
 	, public ITizenChatDataManagerEventsListener
  	, public Tizen::Ui::Controls::ITableViewItemProvider
+ 	, public IImagesManagerDelegate
 {
 public:
 	TizenChatDialogsTab(void);
@@ -41,6 +43,12 @@ public:
 	virtual void OnDataManagerUpdatedMessages();
 	virtual void OnDataManagerUpdatedUser(int userId);
 	virtual void OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText);
+
+	//
+	// Images manager stuff
+	//
+	virtual void OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, Tizen::Base::Collection::HashMap* userInfo);
+	virtual void OnImageManagerDownloadFailed(Tizen::Base::Collection::HashMap* userInfo);
 
 	//
 	// table stuff

@@ -18,6 +18,7 @@ using namespace Tizen::Base::Collection;
 using namespace Tizen::App;
 using namespace Tizen::Io;
 using namespace Tizen::Web::Json;
+using namespace Tizen::Graphics;
 
 Utils::Utils() : registry()
 {
@@ -246,3 +247,16 @@ Utils::JoinNumbersArrayList(Tizen::Base::Collection::ArrayList* arr, Tizen::Base
 	return r;
 }
 
+Tizen::Graphics::Bitmap*
+Utils::GetBitmapWithName(String name)
+{
+    AppResource *pAppResource = App::GetInstance()->GetAppResource();
+    Bitmap* result = null;
+
+    if (pAppResource)
+    {
+        result = pAppResource->GetBitmapN(name, BITMAP_PIXEL_FORMAT_ARGB8888);
+    }
+
+    return result;
+}

@@ -11,8 +11,8 @@
 #include <FUi.h>
 #include <FGraphics.h>
 
+#include "Utils.h"
 #include "Message.h"
-#include "ImagesManager.h"
 
 using namespace Tizen::App;
 using namespace Tizen::Graphics;
@@ -58,36 +58,36 @@ ChatTableViewItem::Construct (const Tizen::Graphics::Dimension &itemSize)
     _pTextLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
     _pTextLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
 
-
 	return r;
+}
+
+void
+ChatTableViewItem::SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap)
+{
+	if (pBitmap == null)
+	{
+		return;
+	}
+
+	Bitmap* result;
+	Bitmap* pMaskBitmap = Utils::getInstance().GetBitmapWithName(String(L"thumbnail_list.png"));
+	if (pMaskBitmap)
+	{
+		Canvas *pCanvas = new Canvas();
+		pCanvas->Construct(Rectangle(0, 0, 108, 108));
+		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
+		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
+
+		result = new Bitmap();
+		result->Construct(*pCanvas, Rectangle(0, 0, 108, 108));
+	}
+
+	_pAvatarLabel->SetBackgroundBitmap(*result);
 }
 
 void
 ChatTableViewItem::FillWithMessage(Message *pMessage)
 {
-	Bitmap *pBitmap = ImagesManager::GetInstance().GetBitmapForUrl(null, 108, 108, null, null);
-
-    AppResource *pAppResource = App::GetInstance()->GetAppResource();
-    Bitmap* result = null;
-
-    if (pAppResource)
-    {
-    	Bitmap* pMaskBitmap = pAppResource->GetBitmapN(L"thumbnail_list.png", BITMAP_PIXEL_FORMAT_ARGB8888);
-
-    	if (pBitmap)
-        {
-    		Canvas *pCanvas = new Canvas();
-    		pCanvas->Construct(Rectangle(0, 0, 108, 108));
-    		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
-    		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
-
-    		result = new Bitmap();
-    		result->Construct(*pCanvas, Rectangle(0, 0, 108, 108));
-        }
-    }
-
-    _pAvatarLabel->SetBackgroundBitmap(*result);
-
     _pTextLabel->SetText(pMessage->body);
 }
 

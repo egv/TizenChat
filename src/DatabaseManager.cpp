@@ -27,7 +27,7 @@ DatabaseManager::DatabaseManager(void)
 	// Create database structure
 	//
 	{
-		String sql(L"create table if not exists Users (id integer primary key, first_name varchar(255), last_name varchar(255), sex integer, screen_name varchar(255), photo varchar(4096), photo_medium_rec varchar(4096), online integer)");
+		String sql(L"create table if not exists VKUsers (id integer primary key, first_name varchar(255), last_name varchar(255), sex integer, screen_name varchar(255), photo varchar(4096), photo_medium_rec varchar(4096), online integer)");
 		result r = __pDatabase->ExecuteSql(sql, true);
 		if (IsFailed(r))
 		{
@@ -85,15 +85,17 @@ DatabaseManager::GetLastMessages(void)
 	AppAssert(pStmt);
 
 	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
-	AppAssert(pEnum);
-
-	while (pEnum->MoveNext() == E_SUCCESS)
+	if (pEnum)
 	{
-		pArrayList->Add(GetMessageFromEnumerator(pEnum));
+
+		while (pEnum->MoveNext() == E_SUCCESS)
+		{
+			pArrayList->Add(GetMessageFromEnumerator(pEnum));
+		}
+		delete pEnum;
 	}
 
 	delete pStmt;
-	delete pEnum;
 
 	return pArrayList;
 }
@@ -118,14 +120,15 @@ DatabaseManager::SaveOrUpdateUser(User* pUser)
 		return;
 	}
 
-	String sql(L"insert or replace into Users ");
-	sql.Append(" (id, sex, online, fisrt_name, last_name, screen_name, photo, photo_medium_rec) ");
+	String sql(L"insert or replace into VKUsers ");
+	sql.Append(" (id, sex, online, first_name, last_name, screen_name, photo, photo_medium_rec) ");
 	sql.Append(" values ");
-	sql.Append(" (?, ?, ?, ?, ?, ?, ?, ?)");
+	sql.Append(" (?, ?, ?, ?, ?, ?, ?, ?) ");
 
 	__pDatabase->BeginTransaction();
 
 	DbStatement *pStmt = __pDatabase->CreateStatementN(sql);
+	AppAssert(pStmt);
 
 	pStmt->BindInt(0, pUser->id.ToInt());					// message id
 	pStmt->BindInt(1, pUser->sex.ToInt());					// message date
@@ -137,12 +140,40 @@ DatabaseManager::SaveOrUpdateUser(User* pUser)
 	pStmt->BindString(7, pUser->photoMediumRec);
 
 	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
-    AppAssert(!pEnum);
 
     delete pStmt;
     delete pEnum;
 
     __pDatabase-> CommitTransaction();
+}
+
+User*
+DatabaseManager::GetUserById(Tizen::Base::LongLong userId)
+{
+	User* pUser = null;
+
+	String sql("select u.id, u.first_name, u.last_name, u.screen_name, u.photo, u.photo_medium_rec, u.sex, u.online ");
+	sql.Append("from VKUsers AS u ");
+	sql.Append("where u.id = ? ");
+
+	DbStatement *pStmt = __pDatabase->CreateStatementN(sql);
+	AppAssert(pStmt);
+
+	pStmt->BindInt(0, userId.ToInt());
+
+	DbEnumerator *pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+	if (pEnum)
+	{
+		if (pEnum->MoveNext() == E_SUCCESS)
+		{
+			pUser = GetUserFromEnumerator(pEnum);
+		}
+
+		delete pEnum;
+	}
+	delete pStmt;
+
+	return pUser;
 }
 
 void
@@ -234,8 +265,8 @@ DatabaseManager::GetUnknownUsers()
 	pArrayList->Construct(1000);
 
 	String sqls[] = {
-			String("select distinct user_id from Messages where user_id not in (select id from Users)"),
-			String("select distinct admin_id from Messages where user_id not in (select id from Users)")
+			String("select distinct user_id from Messages where user_id not in (select id from VKUsers)"),
+			String("select distinct admin_id from Messages where user_id not in (select id from VKUsers)")
 	};
 
 	for (int i=0; i < 2; i++)
@@ -244,20 +275,22 @@ DatabaseManager::GetUnknownUsers()
 		AppAssert(pStmt);
 
 		DbEnumerator *pEnum = __pDatabase->ExecuteStatementN(*pStmt);
-		AppAssert(pEnum);
-		while (pEnum->MoveNext() == E_SUCCESS)
+		if (pEnum)
 		{
-			int i;
-			pEnum->GetIntAt(0, i);
-
-			LongLong* userId = new LongLong(i);
-			if (!pArrayList->Contains(*userId))
+			while (pEnum->MoveNext() == E_SUCCESS)
 			{
-				pArrayList->Add(userId);
-			}
-		}
+				int i;
+				pEnum->GetIntAt(0, i);
 
-		delete pEnum;
+				LongLong* userId = new LongLong(i);
+				if (!pArrayList->Contains(*userId))
+				{
+					pArrayList->Add(userId);
+				}
+			}
+
+			delete pEnum;
+		}
 		delete pStmt;
 	}
 
@@ -304,5 +337,37 @@ DatabaseManager::GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum)
 	pMessage->adminId = LongLong(i);
 
 	return pMessage;
+}
+
+//
+// Parsing user from result
+//
+User*
+DatabaseManager::GetUserFromEnumerator(Tizen::Io::DbEnumerator* pEnum)
+{
+	User* pUser = new User();
+
+	int i;
+	long long ll;
+	String s;
+
+//	String sql("select u.id, u.first_name, u.last_name, u.screen_name, u.photo, u.photo_medium_rec, u.sex, u.online ");
+
+	pEnum->GetIntAt(0, i);
+	pUser->id = LongLong(i);
+
+	pEnum->GetStringAt(1, pUser->firstName);
+	pEnum->GetStringAt(2, pUser->lastName);
+	pEnum->GetStringAt(3, pUser->screenName);
+	pEnum->GetStringAt(4, pUser->photo);
+	pEnum->GetStringAt(5, pUser->photoMediumRec);
+
+	pEnum->GetIntAt(6, i);
+	pUser->sex = LongLong(i);
+
+	pEnum->GetIntAt(7, i);
+	pUser->online = LongLong(i);
+
+	return pUser;
 }
 

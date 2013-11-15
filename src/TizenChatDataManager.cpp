@@ -135,7 +135,7 @@ TizenChatDataManager::LoadUsers(Tizen::Base::Collection::ArrayList* userIds)
 	Utils::getInstance().JoinNumbersArrayList(userIds, userIdsStr);
 
 	url.Append(userIdsStr);
-	url.Append(L"name_case=Nom&fields=sex,online,photo_medium,photo_medium_rec");
+	url.Append(L"&name_case=Nom&fields=screen_name,sex,online,photo_medium,photo_medium_rec");
 	url.Append(L"&access_token=");
 	url.Append(*(Utils::getInstance().accessToken()));
 
@@ -473,8 +473,9 @@ TizenChatDataManager::ParseUsersGetData(HttpTransaction &httpTransaction)
 								result r = pUser->FillWithJsonObject(*pJsonMessageObject);
 								if (r == E_SUCCESS)
 								{
-									AppLogDebug("got user id: %d, name: %S %S", pUser->id.ToInt(), pUser->firstName.GetPointer(), pUser->lastName.GetPointer());
+									pUser->Log();
 									DatabaseManager::GetInstance().SaveOrUpdateUser(pUser);
+									delete pUser;
 								}
 							}
 

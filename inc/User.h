@@ -26,6 +26,9 @@ public:
 
 	User() {};
 	result FillWithJsonObject(const Tizen::Web::Json::JsonObject& object);
+	void Log(void);
 };
+
+
 
 #endif /* USER_H_ */

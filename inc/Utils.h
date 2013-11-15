@@ -11,6 +11,7 @@
 #include <FIo.h>
 #include <FBase.h>
 #include <FWebJson.h>
+#include <FGraphics.h>
 
 #define DELETE_NON_NULL(__what) if (__what != null) delete __what
 
@@ -38,6 +39,8 @@ class Utils
         result LongLongFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::LongLong &out);
         result StringFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::String &out);
         result LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::Collection::ArrayList &out);
+
+        Tizen::Graphics::Bitmap* GetBitmapWithName(String name);
 
     private:
         Registry registry;

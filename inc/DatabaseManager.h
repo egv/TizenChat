@@ -30,6 +30,7 @@ public:
     void SaveOrUpdateMessages(Tizen::Base::Collection::ArrayList* pMessageList);
 
     void SaveOrUpdateUser(User *pUser);
+    User* GetUserById(Tizen::Base::LongLong userId);
     Tizen::Base::Collection::ArrayList* GetUnknownUsers();
 
 private:
@@ -43,7 +44,8 @@ private:
     DatabaseManager(DatabaseManager const&);              // Don't Implement
     void operator=(DatabaseManager const&);               // Don't implement
 
-    Message *GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
+    User* GetUserFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
+    Message* GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
 };
 
 #endif /* DATABASEMANAGER_H_ */
