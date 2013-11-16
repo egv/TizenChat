@@ -67,6 +67,8 @@ private:
 	static const int INVALID_TOKEN_ERROR_CODE = 5;
 
 	void LoadChatHistory();
+
+	Tizen::Graphics::Bitmap* GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex);
 };
 
 #endif // _TIZENCHAT_TAB1_H_

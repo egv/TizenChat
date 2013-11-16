@@ -1,5 +1,7 @@
 #include "AppResourceId.h"
 
+const wchar_t* CHAT_SCENE = L"CHAT_SCENE";
+const wchar_t* ChatForm = L"ChatForm";
 const wchar_t* Contacts = L"Contacts";
 const wchar_t* GetTokenForm = L"GetTokenForm";
 const wchar_t* IDC_TABLEVIEW1 = L"IDC_TABLEVIEW1";
@@ -15,6 +17,7 @@ const wchar_t* ID_SCNT_4 = L"ID_SCNT_4";
 const wchar_t* ID_SCNT_5 = L"ID_SCNT_5";
 const wchar_t* ID_SCNT_6 = L"ID_SCNT_6";
 const wchar_t* ID_SCNT_7 = L"ID_SCNT_7";
+const wchar_t* ID_SCNT_8 = L"ID_SCNT_8";
 const wchar_t* ID_SCNT_NEXT_START = L"ID_SCNT_NEXT_START";
 const wchar_t* ID_SCNT_START = L"ID_SCNT_START";
 const wchar_t* ID_SCNT_1 = L"ID_SCNT_1";

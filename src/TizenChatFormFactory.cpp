@@ -3,6 +3,7 @@
 #include "AppResourceId.h"
 #include "LoginFormClass.h"
 #include "GetTokenFormClass.h"
+#include "ChatFormClass.h"
 
 using namespace Tizen::Ui::Scenes;
 
@@ -40,6 +41,13 @@ TizenChatFormFactory::CreateFormN(const Tizen::Base::String& formId, const Tizen
 		pForm->Initialize();
 		pNewForm = pForm;
 	}
+	else if (formId == ChatForm)
+	{
+		ChatFormClass* pForm = new ChatFormClass();
+		pForm->Initialize();
+		pNewForm = pForm;
+	}
+
 
 
 	// TODO:
