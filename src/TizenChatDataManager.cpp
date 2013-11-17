@@ -136,7 +136,7 @@ TizenChatDataManager::LoadChatHistory(int chatId, int offset, int count, int sta
 
 	url.Append(L"user_id=");
 	url.Append(chatId < 0 ? -chatId : chatId + MAGIC_NUMBER);
-	url.Append(L"&");
+
 
 	result r = SendGetRequest(url, new Integer(MESSAGES_GET_HISTORY_TAG));
 

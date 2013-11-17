@@ -61,7 +61,7 @@ Message::FillWithJsonObject(const JsonObject& object)
 	r = Utils::getInstance().LongLongFromJsonObject(object, String(L"out"), true, isOut);
 	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "unable to get out");
 
-	r = Utils::getInstance().StringFromJsonObject(object, String(L"title"), true, title);
+	r = Utils::getInstance().StringFromJsonObject(object, String(L"title"), false, title);
 	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "unable to get title");
 
 	r = Utils::getInstance().StringFromJsonObject(object, String(L"body"), true, body);

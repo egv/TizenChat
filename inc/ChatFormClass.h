@@ -5,11 +5,14 @@
 #include <FBase.h>
 #include <FUi.h>
 
+#include "ITizenChatDataManagerEventsListener.h"
 
 class ChatFormClass :
 	public Tizen::Ui::Controls::Form
 	, public Tizen::Ui::Scenes::ISceneEventListener
  	, public Tizen::Ui::Controls::IFormBackEventListener
+ 	, public Tizen::Ui::Controls::ITableViewItemProvider
+ 	, public ITizenChatDataManagerEventsListener
 {
 
 // Construction
@@ -20,12 +23,32 @@ public:
 	result OnInitializing(void);
 	result OnTerminating(void);
 
+	// IFormBackEventListener
 	virtual void OnFormBackRequested(Tizen::Ui::Controls::Form& source);
 
-	virtual void OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
-								   const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs);
-	virtual void OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId,
-									const Tizen::Ui::Scenes::SceneId& nextSceneId);
+	// ISceneEventListener
+	virtual void OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousScene, const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs);
+	virtual void OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId, const Tizen::Ui::Scenes::SceneId& nextSceneId);
+
+	// ITableViewItemProvider
+	virtual int GetItemCount(void);
+	virtual Tizen::Ui::Controls::TableViewItem* CreateItem(int itemIndex, int itemWidth);
+	virtual bool DeleteItem(int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem);
+	virtual void UpdateItem(int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem);
+	virtual int GetDefaultItemHeight(void);
+
+	// data manager delegate
+	virtual void OnDataManagerUpdatedLongPollServerData() {};
+	virtual void OnDataManagerUpdatedUser(int userId) {};
+	virtual void OnDataManagerUpdatedMessages();
+	virtual void OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText);
+
+private:
+	static const int INVALID_TOKEN_ERROR_CODE = 5;
+
+	int __chatId;
+	Tizen::Base::Collection::HashMap* __pHeightsCache;
+	Tizen::Base::Collection::ArrayList* __pMessages;
 
 };
 

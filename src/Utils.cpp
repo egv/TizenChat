@@ -121,22 +121,22 @@ Utils::StringFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Ti
 	// check if there is such a key
 	bool hasKey;
 	r = object.ContainsKey(&key, hasKey);
-	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "%s: turned to invalid arg", key.GetPointer());
+	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "%S: turned to invalid arg", key.GetPointer());
 
 	if (mandatory && !hasKey)
 	{
-		TryReturn(hasKey, E_INVALID_ARG, "no key %s in object", key.GetPointer());
+		TryReturn(hasKey, E_INVALID_ARG, "no key %S in object", key.GetPointer());
 	}
 
 	if (hasKey)
 	{
 		IJsonValue *jsonValue = null;
 		r = object.GetValue(&key, jsonValue);
-		TryReturn(r == E_SUCCESS, E_INVALID_ARG, "%s: turned to invalid arg", key.GetPointer());
-		TryReturn(jsonValue != null, E_INVALID_ARG, "value for %s is null", key.GetPointer());
+		TryReturn(r == E_SUCCESS, E_INVALID_ARG, "%S: turned to invalid arg", key.GetPointer());
+		TryReturn(jsonValue != null, E_INVALID_ARG, "value for %S is null", key.GetPointer());
 
 		bool typeIsCorrect = jsonValue->GetType() == JSON_TYPE_STRING || jsonValue->GetType() == JSON_TYPE_NULL;
-		TryReturn(typeIsCorrect, E_INVALID_ARG, "%s is of incorrect type", key.GetPointer());
+		TryReturn(typeIsCorrect, E_INVALID_ARG, "%S is of incorrect type", key.GetPointer());
 
 		if (jsonValue->GetType() != JSON_TYPE_NULL)
 		{

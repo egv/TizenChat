@@ -128,7 +128,7 @@ TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tize
 	{
 		AppLogDebug("will forward to login screen");
 		SceneManager* pSceneManager = SceneManager::GetInstance();
-		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_7));
+		pSceneManager->GoForward(ForwardSceneTransition(LOGIN_SCENE));
 	}
 	else
 	{
@@ -169,12 +169,6 @@ TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
     return pItem;
 }
 
-TableViewItem*
-TizenChatDialogsTab::CreateItemF(int itemIndex, float itemWidth)
-{
-	return null;
-}
-
 bool
 TizenChatDialogsTab::DeleteItem(int itemIndex, TableViewItem* pItem)
 {
@@ -196,12 +190,6 @@ int
 TizenChatDialogsTab::GetDefaultItemHeight(void)
 {
 	return 108;
-}
-
-float
-TizenChatDialogsTab::GetDefaultItemHeightF(void)
-{
-	return 108.0f;
 }
 
 //

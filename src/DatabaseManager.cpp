@@ -109,7 +109,7 @@ DatabaseManager::GetChatMessages(int chatId)
 	String sql("select ");
 	sql.Append("m.id, m.date, m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
 	sql.Append("from Messages as m ");
-	sql.Append("where chat_id = ?");
+	sql.Append("where chat_id = ? ");
 	sql.Append("order by m.date asc");
 
 	DbStatement* pStmt = __pDatabase->CreateStatementN(sql);
@@ -124,6 +124,7 @@ DatabaseManager::GetChatMessages(int chatId)
 		{
 			pArrayList->Add(GetMessageFromEnumerator(pEnum));
 		}
+
 		delete pEnum;
 	}
 
