@@ -48,10 +48,37 @@ MessageTableViewItem::FillWithMessage(Message* pMessage)
 }
 
 void
-MessageTableViewItem::SetBitmap(Tizen::Graphics::Bitmap* bitmap)
+MessageTableViewItem::SetBitmap(Tizen::Graphics::Bitmap* pBitmap)
 {
 	DELETE_NON_NULL(__pBitmap);
-	__pBitmap = bitmap;
+
+	if (pBitmap == null)
+	{
+		AppLogDebug("trying to set empty avatar");
+		return;
+	}
+
+	Bitmap* pMaskBitmap = Utils::getInstance().GetBitmapWithName(String(L"thumbnail_multi.png"));
+	if (pMaskBitmap)
+	{
+		Canvas *pCanvas = new Canvas;
+		pCanvas->Construct(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE));
+		pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
+		pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
+
+		if (__pBitmap != null)
+		{
+			delete __pBitmap;
+		}
+
+		__pBitmap = new Bitmap();
+		__pBitmap->Construct(*pCanvas, Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE));
+
+		delete pCanvas;
+	}
+
+	delete pBitmap;
+	delete pMaskBitmap;
 }
 
 int
