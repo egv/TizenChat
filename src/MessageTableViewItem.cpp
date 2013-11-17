@@ -18,6 +18,8 @@ using namespace Tizen::Base::Collection;
 using namespace Tizen::Graphics;
 using namespace Tizen::Ui::Controls;
 
+#define AVATAR_SIZE 74
+
 MessageTableViewItem::~MessageTableViewItem()
 {
 	DELETE_NON_NULL(__pBitmap);
@@ -27,43 +29,6 @@ MessageTableViewItem::~MessageTableViewItem()
 		delete __pEnrichedText;
 	}
 }
-
-/*
-result
-MessageTableViewItem::Construct(const Dimension& itemSize)
-{
-	RelativeLayout *pRelativeLayout = new RelativeLayout;
-	pRelativeLayout->Construct();
-
-	result r = TableViewItem::Construct(*pRelativeLayout, itemSize);
-	delete pRelativeLayout;
-
-	pRelativeLayout = static_cast<RelativeLayout*>(GetLayoutN());
-
-	__pTextBox = new TextBox;
-	_pTextLabel->Construct(Rectangle(0, 0, 0, 45), L"");
-	AddControl(_pTextLabel);
-	pRelativeLayout->SetRelation(*_pTextLabel, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
-	pRelativeLayout->SetRelation(*_pTextLabel, this, RECT_EDGE_RELATION_LEFT_TO_LEFT);
-	pRelativeLayout->SetRelation(*_pTextLabel, this, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
-	pRelativeLayout->SetMargin(*_pTextLabel, 108, 0, 0, 0);
-    _pTextLabel->SetTextConfig(35, LABEL_TEXT_STYLE_NORMAL);
-    _pTextLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
-    _pTextLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
-
-	_pTimeLabel = new Label;
-	_pTimeLabel->Construct(Rectangle(0, 0, 100, 25), L"");
-	AddControl(_pTimeLabel);
-	pRelativeLayout->SetRelation(*_pTimeLabel, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
-	pRelativeLayout->SetRelation(*_pTimeLabel, this, RECT_EDGE_RELATION_TOP_TO_TOP);
-    _pTimeLabel->SetTextConfig(15, LABEL_TEXT_STYLE_NORMAL);
-    _pTimeLabel->SetTextHorizontalAlignment(ALIGNMENT_RIGHT);
-    _pTimeLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
-
-	return r;
-
-}
-*/
 
 void
 MessageTableViewItem::FillWithMessage(Message* pMessage)
@@ -99,7 +64,7 @@ MessageTableViewItem::HeightForMessage(Message* pMessage, int itemWidth)
 	pEnrichedText->RemoveAll(true);
 	delete pEnrichedText;
 
-	return result;
+	return result < AVATAR_SIZE + 10 ? AVATAR_SIZE + 10 : result;
 }
 
 result
@@ -114,8 +79,18 @@ MessageTableViewItem::OnDraw()
 
 	Canvas *pCanvas = GetCanvasN();
 
-	int startX = __bIsOut ? GetSize().width - __pEnrichedText->GetSize().width : 0;
+	if (pCanvas == null)
+	{
+		return E_FAILURE;
+	}
+
+	int startX = __bIsOut ? GetSize().width - __pEnrichedText->GetSize().width : AVATAR_SIZE + 5;
 	pCanvas->DrawText(Point(startX, 5), *__pEnrichedText);
+
+	if (__pBitmap != null && !__bIsOut)
+	{
+		pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *__pBitmap, Rectangle(0, 0, __pBitmap->GetWidth(), __pBitmap->GetHeight()));
+	}
 
 	return E_SUCCESS;
 }
@@ -125,13 +100,13 @@ MessageTableViewItem::GetEnrichedTextForMessage(Message* pMessage, int itemWidth
 {
 	EnrichedText* pEnrichedText = new (std::nothrow) EnrichedText;
 
-	int usedWidth = 50;
+	int usedWidth = 0;
 
 	if (pMessage->isOut.ToInt() == 0)
 	{
 		if (pMessage->chatId.ToInt() > 0)
 		{
-			usedWidth +=108;
+			usedWidth += AVATAR_SIZE + 5;
 		}
 	}
 

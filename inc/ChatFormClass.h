@@ -4,7 +4,9 @@
 
 #include <FBase.h>
 #include <FUi.h>
+#include <FGraphics.h>
 
+#include "IImagesManagerDelegate.h"
 #include "ITizenChatDataManagerEventsListener.h"
 
 class ChatFormClass :
@@ -13,6 +15,7 @@ class ChatFormClass :
  	, public Tizen::Ui::Controls::IFormBackEventListener
  	, public Tizen::Ui::Controls::ITableViewItemProvider
  	, public ITizenChatDataManagerEventsListener
+ 	, public IImagesManagerDelegate
 {
 
 // Construction
@@ -43,6 +46,10 @@ public:
 	virtual void OnDataManagerUpdatedMessages();
 	virtual void OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tizen::Base::String errorText);
 
+	// Images manager stuff
+	virtual void OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, Tizen::Base::Collection::HashMap* userInfo);
+	virtual void OnImageManagerDownloadFailed(Tizen::Base::Collection::HashMap* userInfo);
+
 private:
 	static const int INVALID_TOKEN_ERROR_CODE = 5;
 
@@ -50,6 +57,7 @@ private:
 	Tizen::Base::Collection::HashMap* __pHeightsCache;
 	Tizen::Base::Collection::ArrayList* __pMessages;
 
+	Tizen::Graphics::Bitmap* GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex);
 };
 
 #endif

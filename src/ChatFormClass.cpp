@@ -9,6 +9,7 @@
 #include "TizenChatDataManager.h"
 #include "MessageTableViewItem.h"
 #include "DatabaseManager.h"
+#include "ImagesManager.h"
 
 using namespace Tizen::Base;
 using namespace Tizen::Base::Collection;
@@ -19,6 +20,8 @@ using namespace Tizen::Ui::Scenes;
 
 ChatFormClass::ChatFormClass(void)
 {
+	__pMessages = null;
+	__pHeightsCache = null;
 }
 
 ChatFormClass::~ChatFormClass(void)
@@ -157,6 +160,11 @@ ChatFormClass::CreateItem(int itemIndex, int itemWidth)
 	pItem->Construct(Dimension(itemWidth, MessageTableViewItem::HeightForMessage(pMessage, itemWidth)));
 	pItem->FillWithMessage(pMessage);
 
+	if (pMessage->chatId.ToInt() > 0)
+	{
+		pItem->SetBitmap(GetAvatarBitmap(pMessage->userId, itemIndex));
+	}
+
 	return pItem;
 }
 
@@ -172,10 +180,76 @@ void ChatFormClass::UpdateItem(int itemIndex, Tizen::Ui::Controls::TableViewItem
 	Message* pMessage = (Message*)__pMessages->GetAt(itemIndex);
 	MessageTableViewItem* pItem = (MessageTableViewItem*)_pItem;
 	pItem->FillWithMessage(pMessage);
+	if (pMessage->chatId.ToInt() > 0)
+	{
+		pItem->SetBitmap(GetAvatarBitmap(pMessage->userId, itemIndex));
+	}
+
 	pItem->Invalidate(true);
 }
 
-int ChatFormClass::GetDefaultItemHeight(void)
+int
+ChatFormClass::GetDefaultItemHeight(void)
 {
 	return 108;
+}
+
+//
+// Image manager stuff
+//
+void
+ChatFormClass::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, Tizen::Base::Collection::HashMap* userInfo)
+{
+	if (userInfo == null)
+	{
+		return;
+	}
+
+//	Integer* listenerTag = null;
+	Integer* rowNumber = null;
+
+	rowNumber = static_cast<Integer*>(userInfo->GetValue(String(L"rowNumber")));
+
+	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
+	if(pTableview1)
+	{
+		AppLogDebug("got success for loading image for row %d, row count: %d", rowNumber->ToInt(), pTableview1->GetItemCount());
+		if (rowNumber->ToInt() < pTableview1->GetItemCount())
+		{
+			pTableview1->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
+		}
+	}
+}
+
+void
+ChatFormClass::OnImageManagerDownloadFailed(Tizen::Base::Collection::HashMap* userInfo)
+{
+	// doing nothing now
+	AppLogDebug("got failure for loading image");
+}
+
+
+Tizen::Graphics::Bitmap*
+ChatFormClass::GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex)
+{
+	Bitmap* result = null;
+    User *pUser = DatabaseManager::GetInstance().GetUserById(userId);
+
+    if (pUser != null)
+    {
+        HashMap* pHashMap = new HashMap;
+        pHashMap->Construct();
+        pHashMap->Add(new String(L"rowNumber"), new Integer(itemIndex));
+        AppLogDebug("will avatar info for user %d from url %S", pUser->id.ToInt(), pUser->photoMediumRec.GetPointer());
+        result = ImagesManager::GetInstance().GetBitmapForUrl(pUser->photoMediumRec, this, pHashMap);
+
+        delete pUser;
+    }
+    else
+    {
+    	AppLogDebug("can not find user with id: %d", userId.ToInt());
+        result = ImagesManager::GetInstance().GetUnknownAvatar();
+    }
+
+    return result;
 }
