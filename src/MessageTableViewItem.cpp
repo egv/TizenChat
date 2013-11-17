@@ -44,6 +44,7 @@ MessageTableViewItem::FillWithMessage(Message* pMessage)
 		__pEnrichedText = MessageTableViewItem::GetEnrichedTextForMessage(pMessage, GetSize().width);
 		AppLogDebug("h: %d, text: %S", __pEnrichedText->GetTotalLineHeight(), pMessage->body.GetPointer());
 		__bIsOut = pMessage->isOut.ToInt() > 0;
+		__isMultichat = pMessage->chatId.ToInt() > 0;
 	}
 }
 
@@ -111,7 +112,7 @@ MessageTableViewItem::OnDraw()
 		return E_FAILURE;
 	}
 
-	int startX = __bIsOut ? GetSize().width - __pEnrichedText->GetSize().width : AVATAR_SIZE + 5;
+	int startX = __bIsOut ? GetSize().width - __pEnrichedText->GetSize().width : (__isMultichat ? AVATAR_SIZE + 10 : 5);
 	pCanvas->DrawText(Point(startX, 5), *__pEnrichedText);
 
 	if (__pBitmap != null && !__bIsOut)
@@ -127,7 +128,7 @@ MessageTableViewItem::GetEnrichedTextForMessage(Message* pMessage, int itemWidth
 {
 	EnrichedText* pEnrichedText = new (std::nothrow) EnrichedText;
 
-	int usedWidth = 0;
+	int usedWidth = 5;
 
 	if (pMessage->isOut.ToInt() == 0)
 	{

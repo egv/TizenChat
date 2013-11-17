@@ -163,8 +163,19 @@ TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
     pItem->Construct(Dimension(itemWidth, GetDefaultItemHeight()));
 
     Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
-    pItem->SetUserAvatar(GetAvatarBitmap(pMessage->userId, itemIndex));
+    User *pUser = DatabaseManager::GetInstance().GetUserById(pMessage->userId);
+
+    pItem->SetUserAvatar(GetAvatarBitmap(pUser, itemIndex));
     pItem->FillWithMessage(pMessage);
+
+    if (pUser != null)
+    {
+        String fullUserName;
+        fullUserName.Format(100, L"%ls %ls", pUser->firstName.GetPointer(), pUser->lastName.GetPointer());
+        pItem->SetUserName(fullUserName);
+    }
+
+    delete pUser;
 
     return pItem;
 }
@@ -182,8 +193,18 @@ TizenChatDialogsTab::UpdateItem(int itemIndex, TableViewItem* pItem)
 {
 	ChatTableViewItem* pChatItem = static_cast<ChatTableViewItem*>(pItem);
     Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
-    pChatItem->SetUserAvatar(GetAvatarBitmap(pMessage->userId, itemIndex));
+    User *pUser = DatabaseManager::GetInstance().GetUserById(pMessage->userId);
+    pChatItem->SetUserAvatar(GetAvatarBitmap(pUser, itemIndex));
     pChatItem->FillWithMessage(pMessage);
+
+    if (pUser != null)
+    {
+        String fullUserName;
+        fullUserName.Format(100, L"%S %S", pUser->firstName.GetPointer(), pUser->lastName.GetPointer());
+        pChatItem->SetUserName(fullUserName);
+    }
+
+    delete pUser;
 }
 
 int
@@ -275,26 +296,20 @@ TizenChatDialogsTab::LoadChatHistory()
 }
 
 Tizen::Graphics::Bitmap*
-TizenChatDialogsTab::GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex)
+TizenChatDialogsTab::GetAvatarBitmap(User* pUser, int itemIndex)
 {
 	Bitmap* result = null;
-    User *pUser = DatabaseManager::GetInstance().GetUserById(userId);
-
     if (pUser != null)
     {
-//    	AppLogDebug("found user with id: %d", userId.ToInt());
-//    	pUser->Log();
         HashMap* pHashMap = new HashMap;
         pHashMap->Construct();
         pHashMap->Add(new String(L"rowNumber"), new Integer(itemIndex));
         AppLogDebug("will avatar info for user %d from url %S", pUser->id.ToInt(), pUser->photoMediumRec.GetPointer());
         result = ImagesManager::GetInstance().GetBitmapForUrl(pUser->photoMediumRec, this, pHashMap);
-
-        delete pUser;
     }
     else
     {
-    	AppLogDebug("can not find user with id: %d", userId.ToInt());
+//    	AppLogDebug("can not find user with id: %d", userId.ToInt());
         result = ImagesManager::GetInstance().GetUnknownAvatar();
     }
 

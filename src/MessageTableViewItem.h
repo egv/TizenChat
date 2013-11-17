@@ -35,6 +35,7 @@ private:
 	Tizen::Graphics::EnrichedText* __pEnrichedText;
 	Tizen::Graphics::Bitmap* __pBitmap;
 	bool __bIsOut;
+	bool __isMultichat;
 
 	static Tizen::Graphics::EnrichedText* GetEnrichedTextForMessage(Message* pMessage, int itemWidth);
 };

@@ -21,6 +21,7 @@ public:
 	result Construct (const Tizen::Graphics::Dimension &itemSize);
 
 	void SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap);
+	void SetUserName(Tizen::Base::String name);
 	void FillWithMessage(Message* pMessage);
 
 	result OnDraw();

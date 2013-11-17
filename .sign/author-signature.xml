@@ -116,7 +116,7 @@
 </Reference>
 <Reference URI="bin/TizenChat.exe">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>J+YSOPYmCV+HcV1vS+Y8/ngIkBlE1OoQuXc1zu1n/FE=</DigestValue>
+<DigestValue>lK9cZNiLO2F/F1QaQUAkc+XuIfQUElHl3rgzj3Q4+cM=</DigestValue>
 </Reference>
 <Reference URI="#prop">
 <Transforms>
@@ -127,9 +127,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-ZMuw2puvJaITEavzVCSFPmPeuejjSGWM+WsUCYVIKo9ejBTZi34IIosh3gpUTGUKP9Ihv80q9lTa
-o7R0u4QVogPmCULKJMhJ/KpHA1amaVkPNDTJqC6YzZh/GO+9JybsdBdxh5Y6ruZAhdr6CDE8/bvo
-7NZuCyhAsaM59TZNLMA=
+j/B54chm2KAG3WTZHOjY49mm+h4QsJUJryyuCEULOp3lFtUIQa8zLtMWviWy4fEF6eYhfc/pYQ4p
+1l8Plnp1yuwihCxxJi5NZhcX7vlz7uucnXSAIHqMKt/efUAZx2GS/GPa+THdJ2s4NClHDpffKpcz
+N60Sa58P0oKTUwREklI=
 </SignatureValue>
 <KeyInfo>
 <X509Data>

@@ -9,6 +9,8 @@
 #include <FGraphics.h>
 #include <gl.h>
 
+#include "User.h"
+
 #include "IImagesManagerDelegate.h"
 #include "ITizenChatDataManagerEventsListener.h"
 
@@ -74,7 +76,7 @@ private:
 
 	void LoadChatHistory();
 
-	Tizen::Graphics::Bitmap* GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex);
+	Tizen::Graphics::Bitmap* GetAvatarBitmap(User* pUser, int itemIndex);
 
 };
 
