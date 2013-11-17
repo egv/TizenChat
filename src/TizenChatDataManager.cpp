@@ -17,6 +17,7 @@
 #include "Message.h"
 #include "User.h"
 
+#define MAGIC_NUMBER 2000000000
 
 const static wchar_t* HTTP_CLIENT_HOST_ADDRESS = L"https://api.vk.com";
 
@@ -70,10 +71,8 @@ TizenChatDataManager::LoadLongPollHistory()
 		return;
 
 	getDialogsRequestRunning = true;
-	String url(L"https://api.vk.com/method/messages.getLongPollHistory?v=5.3&max_msg_id=1&msgs_limit=200&ts=");
+	String url(L"https://api.vk.com/method/messages.getLongPollHistory?max_msg_id=1&msgs_limit=200&ts=");
 	url.Append(__pLongPollServerData->ts.ToString());
-	url.Append("&access_token=");
-	url.Append(*(Utils::getInstance().accessToken()));
 
 	result r = SendGetRequest(url, new Integer(GET_LONG_POLL_HISTORY_REQUEST_TAG));
 
@@ -94,8 +93,7 @@ TizenChatDataManager::LoadLastMessages()
 		return;
 
 	getDialogsRequestRunning = true;
-	String url(L"https://api.vk.com/method/messages.getDialogs?v=5.3&count=200&access_token=");
-	url.Append(*(Utils::getInstance().accessToken()));
+	String url(L"https://api.vk.com/method/messages.getDialogs?count=200");
 
 	result r = SendGetRequest(url, new Integer(GET_DIALOGS_REQUEST_TAG));
 
@@ -103,6 +101,49 @@ TizenChatDataManager::LoadLastMessages()
 	{
 		AppLogDebug("error sending request");
 		getDialogsRequestRunning = false;
+	}
+}
+
+void
+TizenChatDataManager::LoadChatHistory(int chatId, int offset, int count, int startMessageId, int rev)
+{
+	String url(L"https://api.vk.com/method/messages.getHistory?");
+
+	if (offset > 0)
+	{
+		url.Append(L"offset=");
+		url.Append(LongLong(offset).ToString());
+		url.Append(L"&");
+	}
+
+	if (count > 0)
+	{
+		url.Append(L"count=");
+		url.Append(LongLong(count).ToString());
+		url.Append(L"&");
+	}
+
+	if (startMessageId > 0)
+	{
+		url.Append(L"start_message_id=");
+		url.Append(LongLong(startMessageId).ToString());
+		url.Append(L"&");
+	}
+
+	url.Append(L"rev=");
+	url.Append(LongLong(rev).ToString());
+	url.Append(L"&");
+
+	url.Append(L"user_id=");
+	url.Append(chatId < 0 ? -chatId : chatId + MAGIC_NUMBER);
+	url.Append(L"&");
+
+	result r = SendGetRequest(url, new Integer(MESSAGES_GET_HISTORY_TAG));
+
+	if (r != E_SUCCESS)
+	{
+		AppLogDebug("error sending request");
+		__getLongPollServerDataRequest = false;
 	}
 }
 
@@ -114,8 +155,7 @@ TizenChatDataManager::ObtainLongPollServerData()
 		return;
 
 	__getLongPollServerDataRequest = true;
-	String url(L"https://api.vk.com/method/messages.getLongPollServer?v=5.3&access_token=");
-	url.Append(*(Utils::getInstance().accessToken()));
+	String url(L"https://api.vk.com/method/messages.getLongPollServer");
 
 	result r = SendGetRequest(url, new Integer(GET_LONG_POLL_SERVER_DATA_REQUEST_TAG));
 
@@ -129,15 +169,13 @@ TizenChatDataManager::ObtainLongPollServerData()
 void
 TizenChatDataManager::LoadUsers(Tizen::Base::Collection::ArrayList* userIds)
 {
-	String url(L"https://api.vk.com/method/users.get?v=5.3&user_ids=");
+	String url(L"https://api.vk.com/method/users.get?user_ids=");
 
 	String userIdsStr;
 	Utils::getInstance().JoinNumbersArrayList(userIds, userIdsStr);
 
 	url.Append(userIdsStr);
 	url.Append(L"&name_case=Nom&fields=screen_name,sex,online,photo_medium,photo_medium_rec");
-	url.Append(L"&access_token=");
-	url.Append(*(Utils::getInstance().accessToken()));
 
 	result r = SendGetRequest(url, new Integer(USERS_GET_REQUEST_TAG));
 
@@ -164,6 +202,7 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 	switch (opCode)
 	{
 	case GET_DIALOGS_REQUEST_TAG:
+	case MESSAGES_GET_HISTORY_TAG:
 		AppLogDebug("will parse messages");
 		ParseMessages(httpTransaction);
 		break;
@@ -247,7 +286,19 @@ TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Obje
 
 	pHttpTransaction->SetUserObject(tag);
 
-	r = pHttpRequest->SetUri(url);
+	String correctUrl(url);
+	if (correctUrl.Contains(L"?"))
+	{
+		correctUrl.Append(L"&");
+	}
+	else
+	{
+		correctUrl.Append(L"?");
+	}
+	correctUrl.Append(L"v=5.3&access_token=");
+	correctUrl.Append(*(Utils::getInstance().accessToken()));
+
+	r = pHttpRequest->SetUri(correctUrl);
 	r = pHttpRequest->SetMethod(NET_HTTP_METHOD_GET);
 	r = pHttpTransaction->Submit();
 

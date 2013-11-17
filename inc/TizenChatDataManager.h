@@ -35,6 +35,7 @@ public:
     // data-related methods
     void LoadLastMessages();
     void LoadLongPollHistory();
+    void LoadChatHistory(int chatId, int offset=0, int count=200, int startMessageId = 0, int rev = 0);
 
     void LoadUsers(Tizen::Base::Collection::ArrayList* userIds);
     void GetUser(int userId);
@@ -59,6 +60,7 @@ private:
 	static const int GET_DIALOGS_REQUEST_TAG = 101;
 	static const int GET_LONG_POLL_HISTORY_REQUEST_TAG = 102;
 	static const int USERS_GET_REQUEST_TAG = 103;
+	static const int MESSAGES_GET_HISTORY_TAG = 104;
 
 
 	LongPollServerData* __pLongPollServerData;
