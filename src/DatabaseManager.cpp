@@ -106,6 +106,29 @@ DatabaseManager::GetChatMessages(int chatId)
 	ArrayList* pArrayList = new ArrayList();
 	pArrayList->Construct();
 
+	String sql("select ");
+	sql.Append("m.id, m.date, m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
+	sql.Append("from Messages as m ");
+	sql.Append("where chat_id = ?");
+	sql.Append("order by m.date asc");
+
+	DbStatement* pStmt = __pDatabase->CreateStatementN(sql);
+	AppAssert(pStmt);
+
+	pStmt->BindInt(0, chatId);
+
+	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+	if (pEnum)
+	{
+		while (pEnum->MoveNext() == E_SUCCESS)
+		{
+			pArrayList->Add(GetMessageFromEnumerator(pEnum));
+		}
+		delete pEnum;
+	}
+
+	delete pStmt;
+
 	return pArrayList;
 }
 
