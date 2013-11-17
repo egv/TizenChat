@@ -64,16 +64,16 @@ TizenChatMainForm::OnActionPerformed(const Tizen::Ui::Control& source, int actio
 	switch(actionId)
 	{
 	case ID_HEADER_ITEM1:
-		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_1));
+		pSceneManager->GoForward(ForwardSceneTransition(L"Messages"));
 		break;
 	case ID_HEADER_ITEM2:
-		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_2));
+		pSceneManager->GoForward(ForwardSceneTransition(L"Contacts"));
 		break;
 	case ID_HEADER_ITEM3:
-		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_6));
+		pSceneManager->GoForward(ForwardSceneTransition(L"Search"));
 		break;
 	case ID_HEADER_ITEM4:
-		pSceneManager->GoForward(SceneTransitionId(ID_SCNT_3));
+		pSceneManager->GoForward(ForwardSceneTransition(L"Settings"));
 		break;
 
 	default:
@@ -93,14 +93,11 @@ void
 TizenChatMainForm::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
 		const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 void
 TizenChatMainForm::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId,
 		const Tizen::Ui::Scenes::SceneId& nextSceneId)
 {
-	// TODO: Add your implementation codes here
-
+	AppLogDebug("OnSceneDeactivated");
 }

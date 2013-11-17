@@ -10,12 +10,12 @@
     <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_START" Method="" SourceId="" SourceResourceType="" TargetId="LOGIN_SCENE"/>
     <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_NEXT_START" Method="" SourceId="" SourceResourceType="" TargetId="Messages"/>
     <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_3" Method="OnActionPerformed" SourceId="Messages" SourceResourceType="IDF_FORM" TargetId="Settings"/>
-    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_8" Method="OnActionPerformed" SourceId="Messages" SourceResourceType="IDF_FORM" TargetId="CHAT_SCENE"/>
-    <SceneTransition AnimationType="fade" DestroyOption="destroy" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_7" Method="OnDataManagerGotError" SourceId="Messages" SourceResourceType="IDC_PANEL1" TargetId="LOGIN_SCENE"/>
+    <SceneTransition AnimationType="none" DestroyOption="destroy" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_7" Method="OnDataManagerGotError" SourceId="Messages" SourceResourceType="IDC_PANEL1" TargetId="LOGIN_SCENE"/>
+    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_8" Method="OnTableViewItemStateChanged" SourceId="Messages" SourceResourceType="IDC_PANEL1" TargetId="CHAT_SCENE"/>
     <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_1" Method="OnActionPerformed" SourceId="Contacts" SourceResourceType="IDF_FORM" TargetId="Messages"/>
     <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_2" Method="OnActionPerformed" SourceId="Search" SourceResourceType="IDF_FORM" TargetId="Contacts"/>
-    <SceneTransition AnimationType="left" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_4" Method="OnActionPerformed" SourceId="LOGIN_SCENE" SourceResourceType="LoginForm" TargetId="IDSCN_1"/>
-    <SceneTransition AnimationType="left" DestroyOption="destroy" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_5" Method="OnLoadingCompleted" SourceId="IDSCN_1" SourceResourceType="GetTokenForm" TargetId="Messages"/>
+    <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_4" Method="OnActionPerformed" SourceId="LOGIN_SCENE" SourceResourceType="LoginForm" TargetId="IDSCN_1"/>
+    <SceneTransition AnimationType="none" DestroyOption="destroy" DirectionType="forward" HistoryOption="no" Id="ID_SCNT_5" Method="OnLoadingCompleted" SourceId="IDSCN_1" SourceResourceType="GetTokenForm" TargetId="Messages"/>
     <SceneTransition AnimationType="none" DestroyOption="keep" DirectionType="forward" HistoryOption="add" Id="ID_SCNT_6" Method="OnActionPerformed" SourceId="Settings" SourceResourceType="IDF_FORM" TargetId="Search"/>
     <!--UI Builder(Workflow Designer) only-->
     <WorkflowDesigner>
@@ -25,6 +25,6 @@
         <Position Name="LOGIN_SCENE" X="475" Y="10"/>
         <Position Name="IDSCN_1" X="883" Y="23"/>
         <Position Name="Settings" X="10" Y="960"/>
-        <Position Name="CHAT_SCENE" X="674" Y="469"/>
+        <Position Name="CHAT_SCENE" X="518" Y="491"/>
     </WorkflowDesigner>
 </Workflow>

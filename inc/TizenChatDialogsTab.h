@@ -18,6 +18,7 @@ class TizenChatDialogsTab
 	, public ITizenChatDataManagerEventsListener
  	, public Tizen::Ui::Controls::ITableViewItemProvider
  	, public IImagesManagerDelegate
+ 	, public Tizen::Ui::Controls::ITableViewItemEventListener
 {
 public:
 	TizenChatDialogsTab(void);
@@ -61,6 +62,13 @@ public:
 	virtual int GetDefaultItemHeight(void);
 	virtual float GetDefaultItemHeightF(void);
 
+	//
+	// table view item stuff
+	//
+	virtual void OnTableViewItemStateChanged(Tizen::Ui::Controls::TableView& tableView, int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem, Tizen::Ui::Controls::TableViewItemStatus status);
+	virtual void OnTableViewContextItemActivationStateChanged(Tizen::Ui::Controls::TableView& tableView, int itemIndex, Tizen::Ui::Controls::TableViewContextItem* pContextItem, bool activated);
+	virtual void OnTableViewItemReordered(Tizen::Ui::Controls::TableView& tableView, int itemIndexFrom, int itemIndexTo);
+
 private:
 	Tizen::Base::Collection::ArrayList* __pMessagesList;
 
@@ -69,6 +77,7 @@ private:
 	void LoadChatHistory();
 
 	Tizen::Graphics::Bitmap* GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex);
+
 };
 
 #endif // _TIZENCHAT_TAB1_H_

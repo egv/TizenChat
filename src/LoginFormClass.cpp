@@ -8,7 +8,6 @@ using namespace Tizen::Ui::Controls;
 using namespace Tizen::Ui::Scenes;
 
 
-
 LoginFormClass::LoginFormClass(void)
 {
 }
@@ -46,8 +45,6 @@ LoginFormClass::OnTerminating(void)
 {
 	result r = E_SUCCESS;
 
-	// TODO: Add your termination code here
-
 	return r;
 }
 
@@ -57,23 +54,18 @@ void
 LoginFormClass::OnActionPerformed(const Tizen::Ui::Control& source, int actionId)
 {
 	SceneManager* pSceneManager = SceneManager::GetInstance();
-	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_4));
-	// TODO: Add your implementation codes here
-
+	pSceneManager->GoForward(ForwardSceneTransition(L"IDSCN_1"));
 }
 
 void
 LoginFormClass::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
 								const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs)
 {
-	// TODO: Add your implementation codes here
-
+	AppLogDebug("OnSceneActivatedN");
 }
 
 void
 LoginFormClass::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId,
 								const Tizen::Ui::Scenes::SceneId& nextSceneId)
 {
-	// TODO: Add your implementation codes here
-
 }

@@ -43,20 +43,28 @@ TizenChatFrame::OnInitializing(void)
 	static TizenChatPanelFactory panelFactory;
 	pSceneManager->RegisterFormFactory(formFactory);
 	pSceneManager->RegisterPanelFactory(panelFactory);
-	pSceneManager->RegisterScene(L"workflow");
+
+	static const wchar_t* PANEL_BLANK = L"";
+
+	pSceneManager->RegisterScene(L"Messages", L"IDF_FORM", L"IDC_PANEL1");
+	pSceneManager->RegisterScene(L"Contacts", L"IDF_FORM", L"IDC_PANEL2");
+	pSceneManager->RegisterScene(L"Search", L"IDF_FORM", L"IDC_PANEL3");
+	pSceneManager->RegisterScene(L"Settings", L"IDF_FORM", L"SettingsPanel");
+	pSceneManager->RegisterScene(L"LOGIN_SCENE", L"LoginForm", PANEL_BLANK);
+	pSceneManager->RegisterScene(L"IDSCN_1", L"GetTokenForm", PANEL_BLANK);
+	pSceneManager->RegisterScene(L"CHAT_SCENE", L"ChatForm", PANEL_BLANK);
 
 	// Go to the scene.
 	result r = E_FAILURE;
 	if (Utils::getInstance().accessToken() != null)
 	{
-		r = pSceneManager->GoForward(SceneTransitionId(ID_SCNT_NEXT_START));
+		r = pSceneManager->GoForward(ForwardSceneTransition(L"Messages"));
 	}
 	else
 	{
-		r = pSceneManager->GoForward(SceneTransitionId(ID_SCNT_START));
+		r = pSceneManager->GoForward(ForwardSceneTransition(L"LOGIN_SCENE"));
 	}
 
-	// TODO: Add your initialization code here
 	return r;
 }
 
@@ -65,7 +73,5 @@ TizenChatFrame::OnTerminating(void)
 {
 	result r = E_SUCCESS;
 
-	// TODO:
-	// Add your termination code here
 	return r;
 }

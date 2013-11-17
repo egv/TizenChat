@@ -56,8 +56,6 @@ GetTokenFormClass::OnTerminating(void)
 {
 	result r = E_SUCCESS;
 
-	// TODO: Add your termination code here
-
 	return r;
 }
 
@@ -66,31 +64,22 @@ GetTokenFormClass::OnTerminating(void)
 void
 GetTokenFormClass::OnEstimatedProgress(int progress)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 void
 GetTokenFormClass::OnHttpAuthenticationCanceled(void)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 bool
 GetTokenFormClass::OnHttpAuthenticationRequestedN(const Tizen::Base::String& host, const Tizen::Base::String& realm, const Tizen::Web::Controls::AuthenticationChallenge& authentication)
 {
-	// TODO: Add your implementation codes here
-
 	return true;
-
 }
 
 void
 GetTokenFormClass::OnLoadingCanceled(void)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 void
@@ -141,7 +130,7 @@ GetTokenFormClass::OnLoadingCompleted(void)
 					AppLogDebug("token is: %S, expire is: %S", token->GetPointer(), expire->GetPointer());
 
 					SceneManager* pSceneManager = SceneManager::GetInstance();
-					pSceneManager->GoForward(SceneTransitionId(ID_SCNT_5));
+					pSceneManager->GoForward(ForwardSceneTransition(L"Messages"));
 				}
 				else
 				{
@@ -164,52 +153,38 @@ GetTokenFormClass::OnLoadingCompleted(void)
 void
 GetTokenFormClass::OnLoadingErrorOccurred(LoadingErrorType error, const Tizen::Base::String& reason)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 bool
 GetTokenFormClass::OnLoadingRequested(const Tizen::Base::String& url, WebNavigationType type)
 {
-	// TODO: Add your implementation codes here
-
 	return false;
-
 }
 
 void
 GetTokenFormClass::OnLoadingStarted(void)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 void
 GetTokenFormClass::OnPageTitleReceived(const Tizen::Base::String& title)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 DecisionPolicy
 GetTokenFormClass::OnWebDataReceived(const Tizen::Base::String& mime, const Tizen::Net::Http::HttpHeader& httpHeader) 
 {
-	// TODO: Add your implementation codes here
-
 	return WEB_DECISION_CONTINUE;
 }
+
 void
 GetTokenFormClass::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
 								const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs)
 {
-	// TODO: Add your implementation codes here
-
 }
 
 void
 GetTokenFormClass::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId,
 								const Tizen::Ui::Scenes::SceneId& nextSceneId)
 {
-	// TODO: Add your implementation codes here
-
 }

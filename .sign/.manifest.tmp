@@ -1,7 +1,5 @@
-author-signature.xml__DEL__dHr0ahfFXlVTyGaGM46i3+hHH8fzQKs0xYk/6j9EslA=
-bin/TizenChat.exe__DEL__aqdQgdH9ueU0pKfzGVaN5qoDx9Po2UCSxeaaZeg65Ic=
 info/manifest.xml__DEL__rQFbqJGsf5CW/dRfdbiGqgjTu/OmEJa0gd3EOjyBjrg=
-res/.workflow__DEL__uzey7reD5u2oizuqWNK+Dle67Ycyl0T+gR0VtN7ToLs=
+res/.workflow__DEL__wOzKjRwqsYqSemg+Oc9VQuq8ItvVC+vSwplvkPlN4MI=
 res/font/TizenSansMedium.ttf__DEL__tjSmqwK+ka1J62O/lV9NqyXnhb6reBA8mddL5WO2Vz8=
 res/font/TizenSansRegular.ttf__DEL__6NVYVDrHp8O1m/Wj1KvLOC6jqhKTi7YKzAZsH8+x/qw=
 res/screen-density-xhigh/login_background.png__DEL__/2D9WtsxWAx784e1VPjq3uSePp/kmjTgDqTnE3jHF2c=
@@ -18,6 +16,7 @@ res/screen-density-xhigh/thumbnail_list_active.png__DEL__oBRdLEN5bpDorGNThlVa1Nf
 res/screen-density-xhigh/thumbnail_list_unread.png__DEL__x6cHxYKB5y/OOJV1KXaRLXl5BAvjGBCHt+x1hbrZ5E4=
 res/screen-density-xhigh/thumbnail_multi.png__DEL__iUylmuMW3h3L61Rv6mVsCVDzmQKzO07TBqdJ9Hp2wyU=
 res/screen-density-xhigh/Thumbs.db__DEL__vlPShWqCi3YiFN4VWn2nTMip7jETH/OjeGPlg+WfVuU=
+res/screen-size-normal/ChatForm.xml__DEL__luwW0gVOi4a2Zz4udB3VWj9b2ASCA8dlteAuXtgk4bc=
 res/screen-size-normal/GetTokenForm.xml__DEL__v5y6OEKcY6f22wIRMMlcSN8qK3NpPW7KfcxbSVIALVw=
 res/screen-size-normal/IDC_PANEL1.xml__DEL__WX0v2bWdsDyor0TmFR+PBpKDJQDFrVBtpdUrjly/DGY=
 res/screen-size-normal/IDC_PANEL2.xml__DEL__HpI/mKvWYQN858WidURPsdxelx8aHMYRq/leNdtH4iw=
@@ -25,5 +24,7 @@ res/screen-size-normal/IDC_PANEL3.xml__DEL__eDt46ZnzHzlRQhgd3zY0GU0KDAetV8Whsc6M
 res/screen-size-normal/IDF_FORM.xml__DEL__4H19UhOrsTJRnDkm1HugA7qwyuJzjC4do9tpSde4hAM=
 res/screen-size-normal/LoginForm.xml__DEL__Eg8m7QBsIlU4ZwxE1vtYMRgznwh8JSJiEDXcE+66n2w=
 res/screen-size-normal/SettingsPanel.xml__DEL__OV6zE/ZQVlA/f/eJgAdC+5/KiJPsptF5Dkk9yrMSQlI=
-res/screen-size-normal/workflow.xml__DEL__v1KYObFfpLl7Qlb3efOzyQyv3OnoLEl7Eoax6RaRk2M=
+res/screen-size-normal/workflow.xml__DEL__02P8Vznv7/LLxpuGf8wUfuixoN/W/a25jWEuuOZDU38=
 shared/res/screen-density-xhigh/mainmenu.png__DEL__1d0oEZHqPn+QzNzGIHwj9ODby6x9ggFs9uOsav6jPNs=
+bin/TizenChat.exe__DEL__AXT7Cb4mzn2GuTwdq5xfw8KfZQbW0rm+ypSudE/b0eA=
+author-signature.xml__DEL__MWh/DQmPogYRHPtVxy/t5VOvARhQvGTMrBfOgs4I9ok=

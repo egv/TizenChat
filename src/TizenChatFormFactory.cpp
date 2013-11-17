@@ -45,10 +45,9 @@ TizenChatFormFactory::CreateFormN(const Tizen::Base::String& formId, const Tizen
 	{
 		ChatFormClass* pForm = new ChatFormClass();
 		pForm->Initialize();
+		pSceneManager->AddSceneEventListener(sceneId, *pForm);
 		pNewForm = pForm;
 	}
-
-
 
 	// TODO:
 	// Add your form creation code here

@@ -2,17 +2,13 @@
 <SignedInfo>
 <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></CanonicalizationMethod>
 <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></SignatureMethod>
-<Reference URI="bin/TizenChat.exe">
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>aqdQgdH9ueU0pKfzGVaN5qoDx9Po2UCSxeaaZeg65Ic=</DigestValue>
-</Reference>
 <Reference URI="info/manifest.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>rQFbqJGsf5CW/dRfdbiGqgjTu/OmEJa0gd3EOjyBjrg=</DigestValue>
 </Reference>
 <Reference URI="res/.workflow">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>uzey7reD5u2oizuqWNK+Dle67Ycyl0T+gR0VtN7ToLs=</DigestValue>
+<DigestValue>wOzKjRwqsYqSemg+Oc9VQuq8ItvVC+vSwplvkPlN4MI=</DigestValue>
 </Reference>
 <Reference URI="res/font/TizenSansMedium.ttf">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
@@ -78,6 +74,10 @@
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>vlPShWqCi3YiFN4VWn2nTMip7jETH/OjeGPlg+WfVuU=</DigestValue>
 </Reference>
+<Reference URI="res/screen-size-normal/ChatForm.xml">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>luwW0gVOi4a2Zz4udB3VWj9b2ASCA8dlteAuXtgk4bc=</DigestValue>
+</Reference>
 <Reference URI="res/screen-size-normal/GetTokenForm.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>v5y6OEKcY6f22wIRMMlcSN8qK3NpPW7KfcxbSVIALVw=</DigestValue>
@@ -108,11 +108,15 @@
 </Reference>
 <Reference URI="res/screen-size-normal/workflow.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>v1KYObFfpLl7Qlb3efOzyQyv3OnoLEl7Eoax6RaRk2M=</DigestValue>
+<DigestValue>02P8Vznv7/LLxpuGf8wUfuixoN/W/a25jWEuuOZDU38=</DigestValue>
 </Reference>
 <Reference URI="shared/res/screen-density-xhigh/mainmenu.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>1d0oEZHqPn+QzNzGIHwj9ODby6x9ggFs9uOsav6jPNs=</DigestValue>
+</Reference>
+<Reference URI="bin/TizenChat.exe">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>AXT7Cb4mzn2GuTwdq5xfw8KfZQbW0rm+ypSudE/b0eA=</DigestValue>
 </Reference>
 <Reference URI="#prop">
 <Transforms>
@@ -123,9 +127,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-DSOga91YiVFi42XYAf0n9OpSz89/lV2o5lb1LAA0NTpi8No9KNEUW6amKBDmMOpc4gqnQUT9hXjX
-AnHY518iB1ojTG07qDyJnug40bkSNdDejlJZYWoSq3PicHPAqdqGbnfiZq/ho0r+kN+JNos5om3x
-C8/mJC4RU49Mb2eZUjk=
+CAVQCfRYFec+H7/JyG/Z/0XXajwm/mpXD35heOVt86z7ptH6W5bFmIKNYWF5jE4GMwbiRsgLImaO
+DYtTT32XwbBYmGARKoAV62YQV8A890UgFCW/7VuA/LawE/55rv8BUR9HnJOaCldqlesMbzV8k+WQ
+mxrI6u+1trR4gYadsaQ=
 </SignatureValue>
 <KeyInfo>
 <X509Data>

@@ -57,13 +57,10 @@ TizenChatDialogsTab::OnInitializing(void)
 	pRelativeLayout->SetVerticalFitPolicy(*this, FIT_POLICY_PARENT);
 	delete pRelativeLayout;
 
-	TizenChatDataManager::GetInstance().AddDataManagerEventsListener(*this);
-
-	LoadChatHistory();
-
-	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));  
+	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
 	if(pTableview1)
 	{
+		pTableview1->AddTableViewItemEventListener(*this);
 		pTableview1->SetItemProvider(this);
 	}
 
@@ -74,9 +71,6 @@ result
 TizenChatDialogsTab::OnTerminating(void)
 {
 	result r = E_SUCCESS;
-
-	TizenChatDataManager::GetInstance().RemoveDataManagerEventsListener(*this);
-
 	return r;
 }
 
@@ -84,23 +78,18 @@ void
 TizenChatDialogsTab::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSceneId,
 								const Tizen::Ui::Scenes::SceneId& currentSceneId, Tizen::Base::Collection::IList* pArgs)
 {
-	// TODO:
-	// Add your scene activate code here
 	AppLog("OnSceneActivatedN");
-	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
-	if(pTableview1)
-	{
-		pTableview1->UpdateTableView();
-	}
+	TizenChatDataManager::GetInstance().AddDataManagerEventsListener(*this);
+	LoadChatHistory();
 }
 
 void
 TizenChatDialogsTab::OnSceneDeactivated(const Tizen::Ui::Scenes::SceneId& currentSceneId,
 								const Tizen::Ui::Scenes::SceneId& nextSceneId)
 {
-	// TODO:
-	// Add your scene deactivate code here
-	AppLog("OnSceneDeactivated");
+	AppLog("OnSceneDeactivated, next: %S", nextSceneId.GetPointer());
+	TizenChatDataManager::GetInstance().RemoveDataManagerEventsListener(*this);
+	ImagesManager::GetInstance().RemoveListener(this);
 }
 
 void
@@ -183,15 +172,12 @@ TizenChatDialogsTab::CreateItem(int itemIndex, int itemWidth)
 TableViewItem*
 TizenChatDialogsTab::CreateItemF(int itemIndex, float itemWidth)
 {
-	// TODO: Add your implementation codes here
-
 	return null;
 }
 
 bool
 TizenChatDialogsTab::DeleteItem(int itemIndex, TableViewItem* pItem)
 {
-	// TODO: Add your implementation codes here
 	pItem->Destroy();
 
 	return true;
@@ -219,6 +205,38 @@ TizenChatDialogsTab::GetDefaultItemHeightF(void)
 }
 
 //
+// Table item reaction stuff
+//
+void TizenChatDialogsTab::OnTableViewItemStateChanged(Tizen::Ui::Controls::TableView& tableView, int itemIndex, Tizen::Ui::Controls::TableViewItem* pItem, Tizen::Ui::Controls::TableViewItemStatus status)
+{
+	AppLogDebug("item state changed, itemIndex: %d, state: %d", itemIndex, status);
+	if (status == TABLE_VIEW_ITEM_STATUS_SELECTED)
+	{
+		Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
+		SceneManager* pSceneManager = SceneManager::GetInstance();
+		ArrayList* arrayList = new (std::nothrow) ArrayList();
+		arrayList->Construct();
+		arrayList->Add(new Integer(pMessage->chatId.ToInt()));
+
+		result r = pSceneManager->GoForward(ForwardSceneTransition(L"CHAT_SCENE"), arrayList);
+		if (IsFailed(r))
+		{
+			AppLogDebug("failed to go forward: %d", r);
+		}
+	}
+}
+
+void TizenChatDialogsTab::OnTableViewContextItemActivationStateChanged(Tizen::Ui::Controls::TableView& tableView, int itemIndex, Tizen::Ui::Controls::TableViewContextItem* pContextItem, bool activated)
+{
+
+}
+
+void TizenChatDialogsTab::OnTableViewItemReordered(Tizen::Ui::Controls::TableView& tableView, int itemIndexFrom, int itemIndexTo)
+{
+
+}
+
+//
 // Image manager stuff
 //
 void
@@ -229,7 +247,7 @@ TizenChatDialogsTab::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBit
 		return;
 	}
 
-	Integer* listenerTag = null;
+//	Integer* listenerTag = null;
 	Integer* rowNumber = null;
 
 	rowNumber = static_cast<Integer*>(userInfo->GetValue(String(L"rowNumber")));
@@ -268,9 +286,6 @@ TizenChatDialogsTab::LoadChatHistory()
 	}
 }
 
-//SceneManager* pSceneManager = SceneManager::GetInstance();
-//pSceneManager->GoForward(SceneTransitionId(ID_SCNT_8));
-
 Tizen::Graphics::Bitmap*
 TizenChatDialogsTab::GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex)
 {
@@ -279,8 +294,8 @@ TizenChatDialogsTab::GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex
 
     if (pUser != null)
     {
-    	AppLogDebug("found user with id: %d", userId.ToInt());
-    	pUser->Log();
+//    	AppLogDebug("found user with id: %d", userId.ToInt());
+//    	pUser->Log();
         HashMap* pHashMap = new HashMap;
         pHashMap->Construct();
         pHashMap->Add(new String(L"rowNumber"), new Integer(itemIndex));

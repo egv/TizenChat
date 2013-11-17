@@ -16,12 +16,15 @@
 class ChatTableViewItem: public Tizen::Ui::Controls::TableViewItem
 {
 public:
-	int tag;
+	~ChatTableViewItem(void);
 
 	result Construct (const Tizen::Graphics::Dimension &itemSize);
 
 	void SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap);
 	void FillWithMessage(Message* pMessage);
+
+	result OnDraw();
+
 
 protected:
 	Tizen::Ui::Controls::Label* _pAvatarLabel;
@@ -30,6 +33,7 @@ protected:
 	Tizen::Ui::Controls::Label* _pTimeLabel;
 	Tizen::Ui::Controls::Label* _pNameLabel;
 
+	Tizen::Graphics::Bitmap* __pBitmap;
 };
 
 #endif /* CHATTABLEVIEWITEM_H_ */
