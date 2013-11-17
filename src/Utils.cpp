@@ -11,6 +11,7 @@
 #include <FBase.h>
 #include <FIo.h>
 #include <FWebJson.h>
+#include <FLocales.h>
 
 using namespace Tizen::Base;
 using namespace Tizen::Base::Utility;
@@ -19,6 +20,7 @@ using namespace Tizen::App;
 using namespace Tizen::Io;
 using namespace Tizen::Web::Json;
 using namespace Tizen::Graphics;
+using namespace Tizen::Locales;
 
 Utils::Utils() : registry()
 {
@@ -56,6 +58,19 @@ void Utils::setAccessToken(const String& accessToken)
 
 	registry.Flush();
 }
+
+void
+Utils::GetTimeFromTimestamp(LongLong timestamp, String& str)
+{
+	GregorianCalendar* pCalendar = new (std::nothrow) GregorianCalendar;
+	pCalendar->Construct();
+
+	pCalendar->SetTimeInMillisecFromEpoch(timestamp.ToLongLong());
+	str.Format(100, L"%02d:%02d", pCalendar->GetTimeField(TIME_FIELD_HOUR_OF_DAY), pCalendar->GetTimeField(TIME_FIELD_MINUTE));
+
+	delete pCalendar;
+}
+
 
 result
 Utils::LongLongFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::LongLong &out)

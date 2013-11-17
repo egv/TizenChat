@@ -51,6 +51,15 @@ ChatTableViewItem::Construct (const Tizen::Graphics::Dimension &itemSize)
     _pTextLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
     _pTextLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
 
+	_pTimeLabel = new Label;
+	_pTimeLabel->Construct(Rectangle(0, 0, 100, 25), L"");
+	AddControl(_pTimeLabel);
+	pRelativeLayout->SetRelation(*_pTimeLabel, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+	pRelativeLayout->SetRelation(*_pTimeLabel, this, RECT_EDGE_RELATION_TOP_TO_TOP);
+    _pTimeLabel->SetTextConfig(15, LABEL_TEXT_STYLE_NORMAL);
+    _pTimeLabel->SetTextHorizontalAlignment(ALIGNMENT_RIGHT);
+    _pTimeLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
+
 	return r;
 }
 
@@ -89,6 +98,9 @@ ChatTableViewItem::SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap)
 void
 ChatTableViewItem::FillWithMessage(Message *pMessage)
 {
+	String timeStr;
+	Utils::getInstance().GetTimeFromTimestamp(pMessage->date, timeStr);
+	_pTimeLabel->SetText(timeStr);
     _pTextLabel->SetText(pMessage->body);
 }
 

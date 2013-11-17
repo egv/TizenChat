@@ -42,6 +42,8 @@ class Utils
 
         Tizen::Graphics::Bitmap* GetBitmapWithName(String name);
 
+        void GetTimeFromTimestamp(LongLong timestamp, String& str);
+
     private:
         Registry registry;
         String ACCESS_TOKEN_KEY;
