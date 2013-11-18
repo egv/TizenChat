@@ -52,7 +52,6 @@ ChatFormClass::Initialize()
 	pRelativeLayout->SetVerticalFitPolicy(*__pHeaderPanel, FIT_POLICY_FIXED);
 	pRelativeLayout->SetHorizontalFitPolicy(*__pHeaderPanel, FIT_POLICY_PARENT);
 
-
 	{
 		RelativeLayout* pFooterRelativeLayout = new RelativeLayout;
 		pFooterRelativeLayout->Construct();
@@ -66,7 +65,7 @@ ChatFormClass::Initialize()
 		__pExpEditArea = new ExpandableEditArea;
 		__pExpEditArea->Construct(Rectangle(0, 0, 0, 0), EXPANDABLE_EDIT_AREA_STYLE_NORMAL, EXPANDABLE_EDIT_AREA_TITLE_STYLE_NONE, 5);
 		__pExpEditArea->SetGuideText(L"Введите сообщение");
-		__pExpEditArea->SetGuideTextColor(Color::GetColor(COLOR_ID_GREY));
+		__pExpEditArea->SetGuideTextColor(Color(106, 110, 140));
 		__pFooterPanel->AddControl(__pExpEditArea);
 
 		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_LEFT_TO_LEFT);
@@ -77,7 +76,7 @@ ChatFormClass::Initialize()
 		Button* pAttachButton = new Button;
 		pAttachButton->Construct(Rectangle(0, 0, 73, 73), L"");
 		pAttachButton->SetNormalBitmap(Point(5, 5), *(Utils::getInstance().GetBitmapWithName(L"keyboard_icon_attach.png")));
-		pAttachButton->SetColor(BUTTON_STATUS_NORMAL, Color(50, 77, 117));
+		pAttachButton->SetColor(BUTTON_STATUS_NORMAL, Color(33, 38, 45));
 		__pFooterPanel->AddControl(pAttachButton);
 
 		pFooterRelativeLayout->SetRelation(*pAttachButton, __pFooterPanel, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
@@ -122,7 +121,7 @@ ChatFormClass::OnInitializing(void)
 	SetFormBackEventListener(this);
 
 	__pExpEditArea->AddExpandableEditAreaEventListener(*this);
-	__pFooterPanel->SetBackgroundColor(Color::GetColor(COLOR_ID_MAGENTA));
+	__pFooterPanel->SetBackgroundColor(Color(18, 23, 29));
 	__pHeaderPanel->SetBackgroundColor(Color(50, 77, 117));
 
 	return r;

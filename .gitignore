@@ -4,3 +4,4 @@ crash-info/
 Debug\\.gdbinit
 .rds_delta
 .sign
+.sdk_delta.info
