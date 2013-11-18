@@ -34,7 +34,6 @@ bool
 ChatFormClass::Initialize()
 {
 	__pTableView = null;
-	result r;
 	RelativeLayout* pRelativeLayout = new RelativeLayout;
 	pRelativeLayout->Construct();
 
@@ -65,14 +64,26 @@ ChatFormClass::Initialize()
 		pFooterRelativeLayout = (RelativeLayout*)__pFooterPanel->GetLayoutN();
 
 		__pExpEditArea = new ExpandableEditArea;
-		__pExpEditArea->Construct(Rectangle(0, 0, 0, 0), EXPANDABLE_EDIT_AREA_STYLE_NORMAL, EXPANDABLE_EDIT_AREA_TITLE_STYLE_INNER, 5);
+		__pExpEditArea->Construct(Rectangle(0, 0, 0, 0), EXPANDABLE_EDIT_AREA_STYLE_NORMAL, EXPANDABLE_EDIT_AREA_TITLE_STYLE_NONE, 5);
+		__pExpEditArea->SetGuideText(L"Введите сообщение");
+		__pExpEditArea->SetGuideTextColor(Color::GetColor(COLOR_ID_GREY));
 		__pFooterPanel->AddControl(__pExpEditArea);
 
 		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_LEFT_TO_LEFT);
-		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
 		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_TOP_TO_TOP);
 		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
 		pFooterRelativeLayout->SetMargin(*__pExpEditArea, 5, 5, 5, 5);
+
+		Button* pAttachButton = new Button;
+		pAttachButton->Construct(Rectangle(0, 0, 73, 73), L"");
+		pAttachButton->SetNormalBitmap(Point(5, 5), *(Utils::getInstance().GetBitmapWithName(L"keyboard_icon_attach.png")));
+		pAttachButton->SetColor(BUTTON_STATUS_NORMAL, Color(50, 77, 117));
+		__pFooterPanel->AddControl(pAttachButton);
+
+		pFooterRelativeLayout->SetRelation(*pAttachButton, __pFooterPanel, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+		pFooterRelativeLayout->SetRelation(*pAttachButton, __pFooterPanel, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
+		pFooterRelativeLayout->SetMargin(*pAttachButton, 5, 5, 5, 5);
+		pFooterRelativeLayout->SetRelation(*__pExpEditArea, pAttachButton, RECT_EDGE_RELATION_RIGHT_TO_LEFT);
 	}
 
 	AddControl(__pFooterPanel);
@@ -155,15 +166,8 @@ ChatFormClass::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousScene
 			if (__chatId < 0)
 			{
 				__userId = pMessage->userId.ToInt();
-				// single-user dialog
-//				__pAvatarLabel = new Label;
-//				__pAvatarLabel->Construct(Rectangle(0, 0, 88, 88), L"");
-//				pHeader->Add
-
 				User* pUser = DatabaseManager::GetInstance().GetUserById(LongLong(__userId));
 				pHeader->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
-//				__pAvatarLabel->SetBackgroundBitmap(*(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88)));
-//				pHeader->SetTitleIcon(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88));
 			}
 			else
 			{
