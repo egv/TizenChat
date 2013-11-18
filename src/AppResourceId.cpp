@@ -4,6 +4,7 @@ const wchar_t* CHAT_SCENE = L"CHAT_SCENE";
 const wchar_t* ChatForm = L"ChatForm";
 const wchar_t* Contacts = L"Contacts";
 const wchar_t* GetTokenForm = L"GetTokenForm";
+const wchar_t* IDC_EXPANDABLEEDITAREA1 = L"IDC_EXPANDABLEEDITAREA1";
 const wchar_t* IDC_TABLEVIEW1 = L"IDC_TABLEVIEW1";
 const wchar_t* IDC_WEB1 = L"IDC_WEB1";
 const wchar_t* IDF_FORM = L"IDF_FORM";

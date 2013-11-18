@@ -128,6 +128,7 @@ TizenChatDialogsTab::OnDataManagerGotError(Tizen::Base::LongLong errorCode, Tize
 	{
 		AppLogDebug("will forward to login screen");
 		SceneManager* pSceneManager = SceneManager::GetInstance();
+	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_7));
 		pSceneManager->GoForward(ForwardSceneTransition(LOGIN_SCENE));
 	}
 	else
@@ -223,6 +224,7 @@ void TizenChatDialogsTab::OnTableViewItemStateChanged(Tizen::Ui::Controls::Table
 	{
 		Message *pMessage = (Message *)__pMessagesList->GetAt(itemIndex);
 		SceneManager* pSceneManager = SceneManager::GetInstance();
+	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_8));
 		ArrayList* arrayList = new (std::nothrow) ArrayList();
 		arrayList->Construct();
 		arrayList->Add(pMessage);

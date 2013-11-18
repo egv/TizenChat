@@ -130,6 +130,7 @@ GetTokenFormClass::OnLoadingCompleted(void)
 					AppLogDebug("token is: %S, expire is: %S", token->GetPointer(), expire->GetPointer());
 
 					SceneManager* pSceneManager = SceneManager::GetInstance();
+	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_5));
 					pSceneManager->GoForward(ForwardSceneTransition(L"Messages"));
 				}
 				else

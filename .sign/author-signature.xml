@@ -22,6 +22,14 @@
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>/2D9WtsxWAx784e1VPjq3uSePp/kmjTgDqTnE3jHF2c=</DigestValue>
 </Reference>
+<Reference URI="res/screen-density-xhigh/my_bubble.%23.png">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>KPyanyTlG/KEmGM4A0SRaxHSc8NM9Ck4duSDyRYEW7A=</DigestValue>
+</Reference>
+<Reference URI="res/screen-density-xhigh/no_photo_group.png">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>9kYq8PVBA7YtGVgp/qrtFM14CVTYvRjWZccN9TXATfA=</DigestValue>
+</Reference>
 <Reference URI="res/screen-density-xhigh/no_photo_user.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>unWvaoZe89Ujgeib8ZRCvfLsYP4NNm7mAUCEpubllyg=</DigestValue>
@@ -45,6 +53,10 @@
 <Reference URI="res/screen-density-xhigh/tab_marker.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>GVrpB+N0wgobo+9U2UsawRuKTyqI1nurDEvegV1pWIE=</DigestValue>
+</Reference>
+<Reference URI="res/screen-density-xhigh/their_bubble.%23.png">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>u65gS4kHDkSRHvJ0iTEVzRtf7tQg9E7n3Gni7PhoX8s=</DigestValue>
 </Reference>
 <Reference URI="res/screen-density-xhigh/thumbnail_grouped_list.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
@@ -76,7 +88,7 @@
 </Reference>
 <Reference URI="res/screen-size-normal/ChatForm.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>luwW0gVOi4a2Zz4udB3VWj9b2ASCA8dlteAuXtgk4bc=</DigestValue>
+<DigestValue>aQhl3/RcTyTr4Mp0G8y7hVA6BreWCbtI1fA50XguTrE=</DigestValue>
 </Reference>
 <Reference URI="res/screen-size-normal/GetTokenForm.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
@@ -106,29 +118,17 @@
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>OV6zE/ZQVlA/f/eJgAdC+5/KiJPsptF5Dkk9yrMSQlI=</DigestValue>
 </Reference>
-<Reference URI="res/screen-size-normal/workflow.xml">
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>02P8Vznv7/LLxpuGf8wUfuixoN/W/a25jWEuuOZDU38=</DigestValue>
-</Reference>
 <Reference URI="shared/res/screen-density-xhigh/mainmenu.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>1d0oEZHqPn+QzNzGIHwj9ODby6x9ggFs9uOsav6jPNs=</DigestValue>
 </Reference>
-<Reference URI="res/screen-density-xhigh/no_photo_group.png">
+<Reference URI="res/screen-size-normal/workflow.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>9kYq8PVBA7YtGVgp/qrtFM14CVTYvRjWZccN9TXATfA=</DigestValue>
-</Reference>
-<Reference URI="res/screen-density-xhigh/my_bubble.%23.png">
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>KPyanyTlG/KEmGM4A0SRaxHSc8NM9Ck4duSDyRYEW7A=</DigestValue>
-</Reference>
-<Reference URI="res/screen-density-xhigh/their_bubble.%23.png">
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>u65gS4kHDkSRHvJ0iTEVzRtf7tQg9E7n3Gni7PhoX8s=</DigestValue>
+<DigestValue>02P8Vznv7/LLxpuGf8wUfuixoN/W/a25jWEuuOZDU38=</DigestValue>
 </Reference>
 <Reference URI="bin/TizenChat.exe">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>ojJWqQbGMg0VF19OFUFd8UJPEz8EzmLAc+GyvL9aK34=</DigestValue>
+<DigestValue>oPCAjJp+V4IdxFxswKeLSMcivpNzF2mWAr4eur+euhM=</DigestValue>
 </Reference>
 <Reference URI="#prop">
 <Transforms>
@@ -139,9 +139,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-DBFGikxd/Z9IUzsSFdryuKyondExXDQq/q9SS4ze6HP/bth0IOZ2MB+s5BOYMUY7v4qSuwyp8Jpn
-O0N3qEr7vXuon4biwbhuHwaMmh89aL7g0CCS2KDeYJKVRnwe2yHsfzoXNbYqIsca70qoj9ftsThc
-3WQcvm316UjUtlUaXMM=
+nLaYd8ysSdKbIvXGPukasddXR40+pdTwtu8Gk0z6wHy+xk9WrPvC1vVGHdJeqDoFUsSuCqqhrDkC
+tgQa3RBJGs2rjQ4pycYFGczxi4AnEZI4UD2Soy0DKBzSO1q/C6TgrArTDNk9YypRHfnCLPl+2UYh
+1ImXaBNCYRNaEJRKvcQ=
 </SignatureValue>
 <KeyInfo>
 <X509Data>

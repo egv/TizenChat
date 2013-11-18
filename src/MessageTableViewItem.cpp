@@ -135,7 +135,7 @@ MessageTableViewItem::GetEnrichedTextForMessage(Message* pMessage, int itemWidth
 		usedWidth += AVATAR_SIZE + 5;
 	}
 
-	pEnrichedText->Construct(Dimension(itemWidth - usedWidth, 10));
+	pEnrichedText->Construct(Dimension(itemWidth - usedWidth, 1000));
 	pEnrichedText->SetVerticalAlignment(TEXT_ALIGNMENT_TOP);
 	pEnrichedText->SetHorizontalAlignment(pMessage->isOut.ToInt() == 0 ? TEXT_ALIGNMENT_LEFT : TEXT_ALIGNMENT_RIGHT);
 	pEnrichedText->SetTextWrapStyle(TEXT_WRAP_WORD_WRAP);

@@ -55,6 +55,7 @@ LoginFormClass::OnActionPerformed(const Tizen::Ui::Control& source, int actionId
 {
 	SceneManager* pSceneManager = SceneManager::GetInstance();
 	pSceneManager->GoForward(ForwardSceneTransition(L"IDSCN_1"));
+	pSceneManager->GoForward(SceneTransitionId(ID_SCNT_4));
 }
 
 void

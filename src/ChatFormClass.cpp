@@ -33,7 +33,64 @@ ChatFormClass::~ChatFormClass(void)
 bool
 ChatFormClass::Initialize()
 {
-	Form::Construct(ChatForm);
+	__pTableView = null;
+	result r;
+	RelativeLayout* pRelativeLayout = new RelativeLayout;
+	pRelativeLayout->Construct();
+
+	Form::Construct(*pRelativeLayout, FORM_STYLE_NORMAL | FORM_STYLE_INDICATOR);
+
+	delete pRelativeLayout;
+
+	pRelativeLayout = (RelativeLayout*) GetLayoutN();
+
+	__pHeaderPanel = new Panel;
+	__pHeaderPanel->Construct(Rectangle(0, 0, GetWidth(), 100));
+	AddControl(__pHeaderPanel);
+	pRelativeLayout->SetRelation(*__pHeaderPanel, this, RECT_EDGE_RELATION_TOP_TO_TOP);
+	pRelativeLayout->SetRelation(*__pHeaderPanel, this, RECT_EDGE_RELATION_LEFT_TO_LEFT);
+	pRelativeLayout->SetRelation(*__pHeaderPanel, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+	pRelativeLayout->SetVerticalFitPolicy(*__pHeaderPanel, FIT_POLICY_FIXED);
+	pRelativeLayout->SetHorizontalFitPolicy(*__pHeaderPanel, FIT_POLICY_PARENT);
+
+
+	{
+		RelativeLayout* pFooterRelativeLayout = new RelativeLayout;
+		pFooterRelativeLayout->Construct();
+
+		__pFooterPanel = new Panel;
+		__pFooterPanel->Construct(*pFooterRelativeLayout, Rectangle(0, 0, GetWidth(), 100));
+		delete pFooterRelativeLayout;
+
+		pFooterRelativeLayout = (RelativeLayout*)__pFooterPanel->GetLayoutN();
+
+		__pExpEditArea = new ExpandableEditArea;
+		__pExpEditArea->Construct(Rectangle(0, 0, 0, 0), EXPANDABLE_EDIT_AREA_STYLE_NORMAL, EXPANDABLE_EDIT_AREA_TITLE_STYLE_INNER, 5);
+		__pFooterPanel->AddControl(__pExpEditArea);
+
+		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_LEFT_TO_LEFT);
+		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_TOP_TO_TOP);
+		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
+		pFooterRelativeLayout->SetMargin(*__pExpEditArea, 5, 5, 5, 5);
+	}
+
+	AddControl(__pFooterPanel);
+	pRelativeLayout->SetRelation(*__pFooterPanel, this, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
+	pRelativeLayout->SetRelation(*__pFooterPanel, this, RECT_EDGE_RELATION_LEFT_TO_LEFT);
+	pRelativeLayout->SetRelation(*__pFooterPanel, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+	pRelativeLayout->SetVerticalFitPolicy(*__pFooterPanel, FIT_POLICY_FIXED);
+	pRelativeLayout->SetHorizontalFitPolicy(*__pFooterPanel, FIT_POLICY_PARENT);
+
+	__pTableView = new TableView;
+	__pTableView->Construct(Rectangle(0, 100, GetWidth(), 500), true, TABLE_VIEW_SCROLL_BAR_STYLE_FADE_OUT);
+	AddControl(__pTableView);
+	pRelativeLayout->SetRelation(*__pTableView, this, RECT_EDGE_RELATION_LEFT_TO_LEFT);
+	pRelativeLayout->SetRelation(*__pTableView, this, RECT_EDGE_RELATION_TOP_TO_TOP);
+	pRelativeLayout->SetRelation(*__pTableView, this, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+	pRelativeLayout->SetRelation(*__pTableView, __pFooterPanel, RECT_EDGE_RELATION_BOTTOM_TO_TOP);
+	pRelativeLayout->SetRelation(*__pTableView, __pHeaderPanel, RECT_EDGE_RELATION_TOP_TO_BOTTOM);
+	pRelativeLayout->SetHorizontalFitPolicy(*__pTableView, FIT_POLICY_PARENT);
 
 	__pHeightsCache = new (std::nothrow) HashMap();
 	__pHeightsCache->Construct();
@@ -46,17 +103,16 @@ ChatFormClass::OnInitializing(void)
 {
 	result r = E_SUCCESS;
 
-	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
-	if(pTableview1)
+	if(__pTableView != null)
 	{
-		pTableview1->SetItemDividerColor(Color::GetColor(COLOR_ID_MAGENTA));
-		pTableview1->SetItemProvider(this);
+		__pTableView->SetItemProvider(this);
 	}
 
 	SetFormBackEventListener(this);
 
-	Header *pHeader = GetHeader();
-	pHeader->SetStyle(HEADER_STYLE_TITLE);
+	__pExpEditArea->AddExpandableEditAreaEventListener(*this);
+	__pFooterPanel->SetBackgroundColor(Color::GetColor(COLOR_ID_MAGENTA));
+	__pHeaderPanel->SetBackgroundColor(Color(50, 77, 117));
 
 	return r;
 }
@@ -139,10 +195,9 @@ ChatFormClass::OnDataManagerUpdatedMessages()
 
 	AppLogDebug("got %d messages in chat %d", __pMessages->GetCount(), __chatId);
 
-	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
-	if(pTableview1)
+	if(__pTableView != null)
 	{
-		pTableview1->UpdateTableView();
+		__pTableView->UpdateTableView();
 	}
 }
 
@@ -240,20 +295,19 @@ ChatFormClass::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, T
 
 	if (rowNumber->ToInt() == -1)
 	{
-	    User *pUser = DatabaseManager::GetInstance().GetUserById(__userId);
-		GetHeader()->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
+//	    User *pUser = DatabaseManager::GetInstance().GetUserById(__userId);
+//		GetHeader()->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
 //		__pAvatarLabel->SetBackgroundBitmap(*(Utils::getInstance().MaskBitmap(pBitmap, String(L"thumbnail_header.png"), 88, 88)));
 //		__pAvatarLabel->Invalidate(true);
 	}
 	else
 	{
-		TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
-		if(pTableview1)
+		if(__pTableView)
 		{
-			AppLogDebug("got success for loading image for row %d, row count: %d", rowNumber->ToInt(), pTableview1->GetItemCount());
-			if (rowNumber->ToInt() < pTableview1->GetItemCount())
+			AppLogDebug("got success for loading image for row %d, row count: %d", rowNumber->ToInt(), __pTableView->GetItemCount());
+			if (rowNumber->ToInt() < __pTableView->GetItemCount())
 			{
-				pTableview1->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
+				__pTableView->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
 			}
 		}
 	}
@@ -329,4 +383,21 @@ ChatFormClass::GetMultichatHeaderBackgroundBitmap()
 	delete pCanvas;
 
 	return result;
+}
+
+void
+ChatFormClass::OnExpandableEditAreaLineAdded(Tizen::Ui::Controls::ExpandableEditArea& source, int newLineCount)
+{
+	AppLogDebug("line added, size w: %d,  h: %d", source.GetWidth(), source.GetHeight());
+	__pFooterPanel->SetSize(source.GetWidth() + 10, source.GetHeight() + 10);
+	__pFooterPanel->Invalidate(true);
+}
+
+
+void
+ChatFormClass::OnExpandableEditAreaLineRemoved(Tizen::Ui::Controls::ExpandableEditArea& source, int newLineCount)
+{
+	AppLogDebug("line removed, size w: %d,  h: %d", source.GetWidth(), source.GetHeight());
+	__pFooterPanel->SetSize(source.GetWidth() + 10, source.GetHeight() + 10);
+	__pFooterPanel->Invalidate(true);
 }
