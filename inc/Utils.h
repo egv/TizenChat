@@ -41,6 +41,7 @@ class Utils
         result LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::Collection::ArrayList &out);
 
         Tizen::Graphics::Bitmap* GetBitmapWithName(String name);
+        Tizen::Graphics::Bitmap* MaskBitmap(Tizen::Graphics::Bitmap* pBitmap, String maskName, int width, int height);
 
         void GetTimeFromTimestamp(LongLong timestamp, String& str);
 

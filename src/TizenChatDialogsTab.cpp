@@ -225,8 +225,7 @@ void TizenChatDialogsTab::OnTableViewItemStateChanged(Tizen::Ui::Controls::Table
 		SceneManager* pSceneManager = SceneManager::GetInstance();
 		ArrayList* arrayList = new (std::nothrow) ArrayList();
 		arrayList->Construct();
-		arrayList->Add(new Integer(pMessage->chatId.ToInt()));
-
+		arrayList->Add(pMessage);
 		result r = pSceneManager->GoForward(ForwardSceneTransition(L"CHAT_SCENE"), arrayList);
 		if (IsFailed(r))
 		{

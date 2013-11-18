@@ -42,7 +42,10 @@ MessageTableViewItem::FillWithMessage(Message* pMessage)
 		}
 
 		__pEnrichedText = MessageTableViewItem::GetEnrichedTextForMessage(pMessage, GetSize().width);
-		AppLogDebug("h: %d, text: %S", __pEnrichedText->GetTotalLineHeight(), pMessage->body.GetPointer());
+//		Dimension extent;
+//		int actualLength;
+//		__pEnrichedText->GetTextExtent(0, __pEnrichedText->GetTextLength(), extent, actualLength);
+//		AppLogDebug("w: %d, h: %d, ew: %d, eh: %d, l: %d, al: %d, text: %S", __pEnrichedText->GetWidth(), __pEnrichedText->GetTotalLineHeight(), extent.width, extent.height, __pEnrichedText->GetTextLength(), actualLength, pMessage->body.GetPointer());
 		__bIsOut = pMessage->isOut.ToInt() > 0;
 		__isMultichat = pMessage->chatId.ToInt() > 0;
 	}
@@ -59,27 +62,12 @@ MessageTableViewItem::SetBitmap(Tizen::Graphics::Bitmap* pBitmap)
 		return;
 	}
 
-	Bitmap* pMaskBitmap = Utils::getInstance().GetBitmapWithName(String(L"thumbnail_multi.png"));
-	if (pMaskBitmap)
+	if (__pBitmap != null)
 	{
-		Canvas *pCanvas = new Canvas;
-		pCanvas->Construct(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE));
-		pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
-		pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
-
-		if (__pBitmap != null)
-		{
-			delete __pBitmap;
-		}
-
-		__pBitmap = new Bitmap();
-		__pBitmap->Construct(*pCanvas, Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE));
-
-		delete pCanvas;
+		delete __pBitmap;
 	}
 
-	delete pBitmap;
-	delete pMaskBitmap;
+	__pBitmap = Utils::getInstance().MaskBitmap(pBitmap, String(L"thumbnail_multi.png"), AVATAR_SIZE, AVATAR_SIZE);
 }
 
 int
@@ -87,7 +75,7 @@ MessageTableViewItem::HeightForMessage(Message* pMessage, int itemWidth)
 {
 	EnrichedText* pEnrichedText = MessageTableViewItem::GetEnrichedTextForMessage(pMessage, itemWidth);
 
-	int result = pEnrichedText->GetSize().height + 10;
+	int result = pEnrichedText->GetSize().height + 40;
 
 	pEnrichedText->RemoveAll(true);
 	delete pEnrichedText;
@@ -112,12 +100,24 @@ MessageTableViewItem::OnDraw()
 		return E_FAILURE;
 	}
 
-	int startX = __bIsOut ? GetSize().width - __pEnrichedText->GetSize().width : (__isMultichat ? AVATAR_SIZE + 10 : 5);
-	pCanvas->DrawText(Point(startX, 5), *__pEnrichedText);
-
-	if (__pBitmap != null && !__bIsOut)
+	if (__bIsOut)
 	{
-		pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *__pBitmap, Rectangle(0, 0, __pBitmap->GetWidth(), __pBitmap->GetHeight()));
+		Bitmap* bubble = Utils::getInstance().GetBitmapWithName(L"my_bubble.#.png");
+		pCanvas->DrawNinePatchedBitmap(Rectangle(GetSize().width - __pEnrichedText->GetSize().width - 5 - 61, 5, __pEnrichedText->GetSize().width + 61, __pEnrichedText->GetSize().height + 30), *bubble);
+		pCanvas->DrawText(Point(GetSize().width - __pEnrichedText->GetSize().width - 5 - 45, 20), *__pEnrichedText);
+	}
+	else
+	{
+		Bitmap* bubble = Utils::getInstance().GetBitmapWithName(L"their_bubble.#.png");
+
+		int startX = 5 + ((__pBitmap != null && !__bIsOut) ? AVATAR_SIZE : 0);
+		pCanvas->DrawNinePatchedBitmap(Rectangle(startX, 5, __pEnrichedText->GetSize().width + 61, __pEnrichedText->GetSize().height + 30), *bubble);
+		pCanvas->DrawText(Point(startX + 35, 20), *__pEnrichedText);
+
+		if (__pBitmap != null && !__bIsOut)
+		{
+			pCanvas->DrawBitmap(Rectangle(0, 0, AVATAR_SIZE, AVATAR_SIZE), *__pBitmap, Rectangle(0, 0, __pBitmap->GetWidth(), __pBitmap->GetHeight()));
+		}
 	}
 
 	return E_SUCCESS;
@@ -128,14 +128,11 @@ MessageTableViewItem::GetEnrichedTextForMessage(Message* pMessage, int itemWidth
 {
 	EnrichedText* pEnrichedText = new (std::nothrow) EnrichedText;
 
-	int usedWidth = 5;
+	int usedWidth = 66;
 
-	if (pMessage->isOut.ToInt() == 0)
+	if (pMessage->isOut.ToInt() == 0 && pMessage->chatId.ToInt() > 0)
 	{
-		if (pMessage->chatId.ToInt() > 0)
-		{
-			usedWidth += AVATAR_SIZE + 5;
-		}
+		usedWidth += AVATAR_SIZE + 5;
 	}
 
 	pEnrichedText->Construct(Dimension(itemWidth - usedWidth, 10));
@@ -154,7 +151,13 @@ MessageTableViewItem::GetEnrichedTextForMessage(Message* pMessage, int itemWidth
 	pTextElement->SetTextColor(Color::GetColor(COLOR_ID_WHITE));
 	pEnrichedText->Add(*pTextElement);
 
-	pEnrichedText->SetSize(Dimension(itemWidth - usedWidth, pEnrichedText->GetTotalLineHeight()));
+	Dimension extent;
+	int actualLength;
+	int www = itemWidth - usedWidth;
+	pEnrichedText->GetTextExtent(0, pEnrichedText->GetTextLength(), extent, actualLength);
+
+	pEnrichedText->SetSize(Dimension(www < extent.width ? www : extent.width, pEnrichedText->GetTotalLineHeight()));
+	pEnrichedText->Refresh();
 
 	return pEnrichedText;
 }

@@ -6,6 +6,7 @@
 #include <FUi.h>
 #include <FGraphics.h>
 
+#include "User.h"
 #include "IImagesManagerDelegate.h"
 #include "ITizenChatDataManagerEventsListener.h"
 
@@ -56,8 +57,11 @@ private:
 	int __chatId;
 	Tizen::Base::Collection::HashMap* __pHeightsCache;
 	Tizen::Base::Collection::ArrayList* __pMessages;
+	int __userId;
 
-	Tizen::Graphics::Bitmap* GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex);
+	Tizen::Graphics::Bitmap* GetAvatarBitmap(User* pUser, int itemIndex);
+	Tizen::Graphics::Bitmap* GetDialogHeaderBackgroundBitmap(User* pUser);
+	Tizen::Graphics::Bitmap* GetMultichatHeaderBackgroundBitmap();
 };
 
 #endif

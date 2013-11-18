@@ -91,27 +91,12 @@ ChatTableViewItem::SetUserAvatar(Tizen::Graphics::Bitmap* pBitmap)
 		return;
 	}
 
-	Bitmap* pMaskBitmap = Utils::getInstance().GetBitmapWithName(String(L"thumbnail_list.png"));
-	if (pMaskBitmap)
+	if (__pBitmap != null)
 	{
-		Canvas *pCanvas = new Canvas;
-		pCanvas->Construct(Rectangle(0, 0, 108, 108));
-		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
-		pCanvas->DrawBitmap(Rectangle(0, 0, 108, 108), *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
-
-		if (__pBitmap != null)
-		{
-			delete __pBitmap;
-		}
-
-		__pBitmap = new Bitmap();
-		__pBitmap->Construct(*pCanvas, Rectangle(0, 0, 108, 108));
-
-		delete pCanvas;
+		delete __pBitmap;
 	}
 
-	delete pBitmap;
-	delete pMaskBitmap;
+	__pBitmap = Utils::getInstance().MaskBitmap(pBitmap, String(L"thumbnail_list.png"), 108, 108);
 }
 
 void

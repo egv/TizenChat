@@ -55,6 +55,9 @@ ChatFormClass::OnInitializing(void)
 
 	SetFormBackEventListener(this);
 
+	Header *pHeader = GetHeader();
+	pHeader->SetStyle(HEADER_STYLE_TITLE);
+
 	return r;
 }
 
@@ -83,12 +86,35 @@ ChatFormClass::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousScene
 	AppLogDebug("OnSceneActivatedN");
 	if (pArgs->GetCount())
 	{
-		Integer* chatId = (Integer*) pArgs->GetAt(0);
-		AppLogDebug("need to show chat: %d", chatId->ToInt());
-		__chatId = chatId->ToInt();
+		Message* pMessage = (Message*) pArgs->GetAt(0);
+		__chatId = pMessage->chatId.ToInt();
+		AppLogDebug("need to show chat: %d", __chatId);
 
 		TizenChatDataManager::GetInstance().AddDataManagerEventsListener(*this);
 		TizenChatDataManager::GetInstance().LoadChatHistory(__chatId);
+
+		Header* pHeader = GetHeader();
+		if (pHeader != null)
+		{
+			if (__chatId < 0)
+			{
+				__userId = pMessage->userId.ToInt();
+				// single-user dialog
+//				__pAvatarLabel = new Label;
+//				__pAvatarLabel->Construct(Rectangle(0, 0, 88, 88), L"");
+//				pHeader->Add
+
+				User* pUser = DatabaseManager::GetInstance().GetUserById(LongLong(__userId));
+				pHeader->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
+//				__pAvatarLabel->SetBackgroundBitmap(*(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88)));
+//				pHeader->SetTitleIcon(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88));
+			}
+			else
+			{
+				// multi-user chat
+				pHeader->SetBackgroundBitmap(GetMultichatHeaderBackgroundBitmap());
+			}
+		}
 	}
 }
 
@@ -162,7 +188,8 @@ ChatFormClass::CreateItem(int itemIndex, int itemWidth)
 
 	if (pMessage->chatId.ToInt() > 0)
 	{
-		pItem->SetBitmap(GetAvatarBitmap(pMessage->userId, itemIndex));
+	    User *pUser = DatabaseManager::GetInstance().GetUserById(pMessage->userId);
+		pItem->SetBitmap(GetAvatarBitmap(pUser, itemIndex));
 	}
 
 	return pItem;
@@ -182,7 +209,8 @@ void ChatFormClass::UpdateItem(int itemIndex, Tizen::Ui::Controls::TableViewItem
 	pItem->FillWithMessage(pMessage);
 	if (pMessage->chatId.ToInt() > 0)
 	{
-		pItem->SetBitmap(GetAvatarBitmap(pMessage->userId, itemIndex));
+	    User *pUser = DatabaseManager::GetInstance().GetUserById(pMessage->userId);
+		pItem->SetBitmap(GetAvatarBitmap(pUser, itemIndex));
 	}
 
 	pItem->Invalidate(true);
@@ -210,13 +238,23 @@ ChatFormClass::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, T
 
 	rowNumber = static_cast<Integer*>(userInfo->GetValue(String(L"rowNumber")));
 
-	TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
-	if(pTableview1)
+	if (rowNumber->ToInt() == -1)
 	{
-		AppLogDebug("got success for loading image for row %d, row count: %d", rowNumber->ToInt(), pTableview1->GetItemCount());
-		if (rowNumber->ToInt() < pTableview1->GetItemCount())
+	    User *pUser = DatabaseManager::GetInstance().GetUserById(__userId);
+		GetHeader()->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
+//		__pAvatarLabel->SetBackgroundBitmap(*(Utils::getInstance().MaskBitmap(pBitmap, String(L"thumbnail_header.png"), 88, 88)));
+//		__pAvatarLabel->Invalidate(true);
+	}
+	else
+	{
+		TableView* pTableview1 = static_cast<TableView*>(GetControl(IDC_TABLEVIEW1));
+		if(pTableview1)
 		{
-			pTableview1->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
+			AppLogDebug("got success for loading image for row %d, row count: %d", rowNumber->ToInt(), pTableview1->GetItemCount());
+			if (rowNumber->ToInt() < pTableview1->GetItemCount())
+			{
+				pTableview1->RefreshItem(rowNumber->ToInt(), TABLE_VIEW_REFRESH_TYPE_ITEM_MODIFY);
+			}
 		}
 	}
 }
@@ -230,10 +268,9 @@ ChatFormClass::OnImageManagerDownloadFailed(Tizen::Base::Collection::HashMap* us
 
 
 Tizen::Graphics::Bitmap*
-ChatFormClass::GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex)
+ChatFormClass::GetAvatarBitmap(User* pUser, int itemIndex)
 {
 	Bitmap* result = null;
-    User *pUser = DatabaseManager::GetInstance().GetUserById(userId);
 
     if (pUser != null)
     {
@@ -242,14 +279,54 @@ ChatFormClass::GetAvatarBitmap(Tizen::Base::LongLong userId, int itemIndex)
         pHashMap->Add(new String(L"rowNumber"), new Integer(itemIndex));
         AppLogDebug("will avatar info for user %d from url %S", pUser->id.ToInt(), pUser->photoMediumRec.GetPointer());
         result = ImagesManager::GetInstance().GetBitmapForUrl(pUser->photoMediumRec, this, pHashMap);
-
-        delete pUser;
     }
     else
     {
-    	AppLogDebug("can not find user with id: %d", userId.ToInt());
         result = ImagesManager::GetInstance().GetUnknownAvatar();
     }
 
     return result;
+}
+
+Tizen::Graphics::Bitmap*
+ChatFormClass::GetDialogHeaderBackgroundBitmap(User* pUser)
+{
+	if (pUser == null)
+	{
+		return null;
+	}
+
+	Bitmap* result = null;
+	Canvas* pCanvas = new Canvas;
+	Rectangle rect = Rectangle(0, 0, GetHeader()->GetSize().width, GetHeader()->GetSize().height);
+	pCanvas->Construct(rect);
+	pCanvas->SetBackgroundColor(Color(50, 77, 117));
+	pCanvas->FillRectangle(Color::GetColor(COLOR_ID_RED), rect);
+	pCanvas->DrawBitmap(Rectangle(0, 0, 88, 88), *(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88)));
+
+	result = new Bitmap;
+	result->Construct(*pCanvas, rect);
+
+	delete pCanvas;
+
+	return result;
+}
+
+Tizen::Graphics::Bitmap*
+ChatFormClass::GetMultichatHeaderBackgroundBitmap()
+{
+	Bitmap* result = null;
+	Canvas* pCanvas = new Canvas;
+	Rectangle rect = Rectangle(0, 0, GetHeader()->GetSize().width, GetHeader()->GetSize().height);
+	pCanvas->Construct(rect);
+	pCanvas->SetBackgroundColor(Color(50, 77, 117, 255));
+	Bitmap* img = Utils::getInstance().GetBitmapWithName(String(L"no_photo_group.png"));
+	pCanvas->DrawBitmap(Rectangle(0, 0, 88, 88), *img, Rectangle(0, 0, img->GetWidth(), img->GetHeight()));
+
+	result = new Bitmap;
+	result->Construct(*pCanvas, rect);
+
+	delete pCanvas;
+
+	return result;
 }

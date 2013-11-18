@@ -275,3 +275,36 @@ Utils::GetBitmapWithName(String name)
 
     return result;
 }
+
+Tizen::Graphics::Bitmap*
+Utils::MaskBitmap(Tizen::Graphics::Bitmap* pBitmap, String maskName, int width, int height)
+{
+	if (pBitmap == null)
+	{
+		AppLogDebug("trying to set empty avatar");
+		return null;
+	}
+
+	Bitmap* __pBitmap;
+	Bitmap* pMaskBitmap = GetBitmapWithName(maskName);
+
+	if (pMaskBitmap)
+	{
+		Canvas *pCanvas = new Canvas;
+		Rectangle rect = Rectangle(0, 0, width, height);
+		pCanvas->Construct(rect);
+		pCanvas->DrawBitmap(rect, *pBitmap, Rectangle(0, 0, pBitmap->GetWidth(), pBitmap->GetHeight()));
+		pCanvas->DrawBitmap(rect, *pMaskBitmap, Rectangle(0, 0, pMaskBitmap->GetWidth(), pMaskBitmap->GetHeight()));
+
+		__pBitmap = new Bitmap();
+		__pBitmap->Construct(*pCanvas, rect);
+
+		delete pCanvas;
+	}
+
+	delete pBitmap;
+	delete pMaskBitmap;
+
+	return __pBitmap;
+}
+
