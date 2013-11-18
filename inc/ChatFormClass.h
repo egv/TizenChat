@@ -65,12 +65,18 @@ private:
 	int __userId;
 
 	Tizen::Ui::Controls::TableView* __pTableView;
+
 	Tizen::Ui::Controls::Panel* __pHeaderPanel;
+	Tizen::Ui::Controls::Label* __pAvatarLabel;
+	Tizen::Ui::Controls::Label* __pDotLabel;
+	Tizen::Ui::Controls::Label* __pNameLabel;
+	Tizen::Ui::Controls::Label* __pStatusLabel;
+
 	Tizen::Ui::Controls::Panel* __pFooterPanel;
 	Tizen::Ui::Controls::ExpandableEditArea* __pExpEditArea;
 
 	Tizen::Graphics::Bitmap* GetAvatarBitmap(User* pUser, int itemIndex);
-	Tizen::Graphics::Bitmap* GetDialogHeaderBackgroundBitmap(User* pUser);
+	void DrawDialogHeaderBackgroundBitmap(User* pUser);
 	Tizen::Graphics::Bitmap* GetMultichatHeaderBackgroundBitmap();
 };
 

@@ -43,8 +43,49 @@ ChatFormClass::Initialize()
 
 	pRelativeLayout = (RelativeLayout*) GetLayoutN();
 
-	__pHeaderPanel = new Panel;
-	__pHeaderPanel->Construct(Rectangle(0, 0, GetWidth(), 100));
+	{
+		RelativeLayout* pHeaderRelativeLayout = new RelativeLayout;
+		pHeaderRelativeLayout->Construct();
+
+		__pHeaderPanel = new Panel;
+		__pHeaderPanel->Construct(*pHeaderRelativeLayout, Rectangle(0, 0, GetWidth(), 100));
+		delete pHeaderRelativeLayout;
+		pHeaderRelativeLayout = (RelativeLayout*)__pHeaderPanel->GetLayoutN();
+
+		__pAvatarLabel = new Label;
+		__pAvatarLabel->Construct(Rectangle(12, 12, 88, 88), L"");
+		__pHeaderPanel->AddControl(__pAvatarLabel);
+		pHeaderRelativeLayout->SetMargin(*__pAvatarLabel, 12, 12, 12, 12);
+		pHeaderRelativeLayout->SetRelation(*__pAvatarLabel, __pHeaderPanel, RECT_EDGE_RELATION_LEFT_TO_LEFT);
+		pHeaderRelativeLayout->SetRelation(*__pAvatarLabel, __pHeaderPanel, RECT_EDGE_RELATION_TOP_TO_TOP);
+		pHeaderRelativeLayout->SetRelation(*__pAvatarLabel, __pHeaderPanel, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
+
+		__pNameLabel = new Label;
+		__pNameLabel->Construct(Rectangle(0, 0, 0, 40), L"");
+		__pHeaderPanel->AddControl(__pNameLabel);
+		pHeaderRelativeLayout->SetMargin(*__pNameLabel, 10, 0, 10, 0);
+		pHeaderRelativeLayout->SetRelation(*__pNameLabel, __pAvatarLabel, RECT_EDGE_RELATION_LEFT_TO_RIGHT);
+		pHeaderRelativeLayout->SetRelation(*__pNameLabel, __pHeaderPanel, RECT_EDGE_RELATION_TOP_TO_TOP);
+		pHeaderRelativeLayout->SetRelation(*__pNameLabel, __pHeaderPanel, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+		__pNameLabel->SetTextConfig(35, LABEL_TEXT_STYLE_BOLD);
+		__pNameLabel->SetTextColor(Color::GetColor(COLOR_ID_WHITE));
+		__pNameLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
+
+		__pStatusLabel = new Label;
+		__pStatusLabel->Construct(Rectangle(0, 0, 0, 40), L"");
+		__pHeaderPanel->AddControl(__pStatusLabel);
+		pHeaderRelativeLayout->SetMargin(*__pStatusLabel, 10, 0, 0, 10);
+		pHeaderRelativeLayout->SetRelation(*__pStatusLabel, __pAvatarLabel, RECT_EDGE_RELATION_LEFT_TO_RIGHT);
+		pHeaderRelativeLayout->SetRelation(*__pStatusLabel, __pHeaderPanel, RECT_EDGE_RELATION_BOTTOM_TO_BOTTOM);
+		pHeaderRelativeLayout->SetRelation(*__pStatusLabel, __pHeaderPanel, RECT_EDGE_RELATION_RIGHT_TO_RIGHT);
+		pHeaderRelativeLayout->SetRelation(*__pStatusLabel, __pNameLabel, RECT_EDGE_RELATION_TOP_TO_BOTTOM);
+		__pStatusLabel->SetTextConfig(30, LABEL_TEXT_STYLE_NORMAL);
+		__pStatusLabel->SetTextColor(Color::GetColor(COLOR_ID_WHITE));
+		__pStatusLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
+
+
+	}
+
 	AddControl(__pHeaderPanel);
 	pRelativeLayout->SetRelation(*__pHeaderPanel, this, RECT_EDGE_RELATION_TOP_TO_TOP);
 	pRelativeLayout->SetRelation(*__pHeaderPanel, this, RECT_EDGE_RELATION_LEFT_TO_LEFT);
@@ -122,7 +163,7 @@ ChatFormClass::OnInitializing(void)
 
 	__pExpEditArea->AddExpandableEditAreaEventListener(*this);
 	__pFooterPanel->SetBackgroundColor(Color(18, 23, 29));
-	__pHeaderPanel->SetBackgroundColor(Color(50, 77, 117));
+	__pHeaderPanel->SetBackgroundColor(Color(50+15, 77+20, 117+20));
 
 	return r;
 }
@@ -159,21 +200,17 @@ ChatFormClass::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousScene
 		TizenChatDataManager::GetInstance().AddDataManagerEventsListener(*this);
 		TizenChatDataManager::GetInstance().LoadChatHistory(__chatId);
 
-		Header* pHeader = GetHeader();
-		if (pHeader != null)
-		{
 			if (__chatId < 0)
 			{
 				__userId = pMessage->userId.ToInt();
 				User* pUser = DatabaseManager::GetInstance().GetUserById(LongLong(__userId));
-				pHeader->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
+				DrawDialogHeaderBackgroundBitmap(pUser);
 			}
 			else
 			{
 				// multi-user chat
-				pHeader->SetBackgroundBitmap(GetMultichatHeaderBackgroundBitmap());
+//				pHeader->SetBackgroundBitmap(GetMultichatHeaderBackgroundBitmap());
 			}
-		}
 	}
 }
 
@@ -298,10 +335,8 @@ ChatFormClass::OnImageManagerDownloadedImage(Tizen::Graphics::Bitmap* pBitmap, T
 
 	if (rowNumber->ToInt() == -1)
 	{
-//	    User *pUser = DatabaseManager::GetInstance().GetUserById(__userId);
-//		GetHeader()->SetBackgroundBitmap(GetDialogHeaderBackgroundBitmap(pUser));
-//		__pAvatarLabel->SetBackgroundBitmap(*(Utils::getInstance().MaskBitmap(pBitmap, String(L"thumbnail_header.png"), 88, 88)));
-//		__pAvatarLabel->Invalidate(true);
+	    User *pUser = DatabaseManager::GetInstance().GetUserById(__userId);
+	    DrawDialogHeaderBackgroundBitmap(pUser);
 	}
 	else
 	{
@@ -345,28 +380,20 @@ ChatFormClass::GetAvatarBitmap(User* pUser, int itemIndex)
     return result;
 }
 
-Tizen::Graphics::Bitmap*
-ChatFormClass::GetDialogHeaderBackgroundBitmap(User* pUser)
+void
+ChatFormClass::DrawDialogHeaderBackgroundBitmap(User* pUser)
 {
 	if (pUser == null)
 	{
-		return null;
+		return;
 	}
 
-	Bitmap* result = null;
-	Canvas* pCanvas = new Canvas;
-	Rectangle rect = Rectangle(0, 0, GetHeader()->GetSize().width, GetHeader()->GetSize().height);
-	pCanvas->Construct(rect);
-	pCanvas->SetBackgroundColor(Color(50, 77, 117));
-	pCanvas->FillRectangle(Color::GetColor(COLOR_ID_RED), rect);
-	pCanvas->DrawBitmap(Rectangle(0, 0, 88, 88), *(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88)));
+	__pAvatarLabel->SetBackgroundBitmap(*(Utils::getInstance().MaskBitmap(GetAvatarBitmap(pUser, -1), String(L"thumbnail_header.png"), 88, 88)));
 
-	result = new Bitmap;
-	result->Construct(*pCanvas, rect);
-
-	delete pCanvas;
-
-	return result;
+	String name;
+	name.Format(100, L"%S %S", pUser->firstName.GetPointer(), pUser->lastName.GetPointer());
+	__pNameLabel->SetText(name);
+	__pStatusLabel->SetText(pUser->online.ToInt() == 1 ? L"Online" : L"Offline");
 }
 
 Tizen::Graphics::Bitmap*
