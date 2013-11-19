@@ -16,6 +16,7 @@ class ChatFormClass :
  	, public Tizen::Ui::Controls::IFormBackEventListener
  	, public Tizen::Ui::Controls::ITableViewItemProvider
  	, public Tizen::Ui::Controls::IExpandableEditAreaEventListener
+ 	, public Tizen::Ui::IKeypadEventListener
  	, public ITizenChatDataManagerEventsListener
  	, public IImagesManagerDelegate
 {
@@ -45,6 +46,13 @@ public:
 	// expandable area
 	virtual void OnExpandableEditAreaLineAdded(Tizen::Ui::Controls::ExpandableEditArea& source, int newLineCount);
 	virtual void OnExpandableEditAreaLineRemoved(Tizen::Ui::Controls::ExpandableEditArea& source, int newLineCount);
+
+	// keypad
+	virtual void OnKeypadActionPerformed (Tizen::Ui::Control &source, Tizen::Ui::KeypadAction keypadAction);
+	virtual void OnKeypadBoundsChanged (Tizen::Ui::Control &source) {};
+	virtual void OnKeypadClosed (Tizen::Ui::Control &source) {};
+	virtual void OnKeypadOpened (Tizen::Ui::Control &source) {};
+	virtual void OnKeypadWillOpen (Tizen::Ui::Control &source) {};
 
 	// data manager delegate
 	virtual void OnDataManagerUpdatedLongPollServerData() {};

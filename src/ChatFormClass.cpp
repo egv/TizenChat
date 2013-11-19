@@ -107,6 +107,7 @@ ChatFormClass::Initialize()
 		__pExpEditArea->Construct(Rectangle(0, 0, 0, 0), EXPANDABLE_EDIT_AREA_STYLE_NORMAL, EXPANDABLE_EDIT_AREA_TITLE_STYLE_NONE, 5);
 		__pExpEditArea->SetGuideText(L"Введите сообщение");
 		__pExpEditArea->SetGuideTextColor(Color(106, 110, 140));
+		__pExpEditArea->SetKeypadAction(KEYPAD_ACTION_SEND);
 		__pFooterPanel->AddControl(__pExpEditArea);
 
 		pFooterRelativeLayout->SetRelation(*__pExpEditArea, __pFooterPanel, RECT_EDGE_RELATION_LEFT_TO_LEFT);
@@ -161,6 +162,7 @@ ChatFormClass::OnInitializing(void)
 
 	SetFormBackEventListener(this);
 
+	__pExpEditArea->AddKeypadEventListener(*this);
 	__pExpEditArea->AddExpandableEditAreaEventListener(*this);
 	__pFooterPanel->SetBackgroundColor(Color(18, 23, 29));
 	__pHeaderPanel->SetBackgroundColor(Color(50+15, 77+20, 117+20));
@@ -430,4 +432,19 @@ ChatFormClass::OnExpandableEditAreaLineRemoved(Tizen::Ui::Controls::ExpandableEd
 	AppLogDebug("line removed, size w: %d,  h: %d", source.GetWidth(), source.GetHeight());
 	__pFooterPanel->SetSize(source.GetWidth() + 10, source.GetHeight() + 10);
 	__pFooterPanel->Invalidate(true);
+}
+
+void
+ChatFormClass::OnKeypadActionPerformed (Tizen::Ui::Control &source, Tizen::Ui::KeypadAction keypadAction)
+{
+	if (keypadAction == KEYPAD_ACTION_SEND)
+	{
+		if (__pExpEditArea->GetText().GetLength() > 0)
+		{
+			String text = __pExpEditArea->GetText();
+			__pExpEditArea->SetText(L"");
+			__pExpEditArea->Invalidate(true);
+			AppLogDebug("will send message: %S", text.GetPointer());
+		}
+	}
 }
