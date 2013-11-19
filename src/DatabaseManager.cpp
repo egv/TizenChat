@@ -40,7 +40,7 @@ DatabaseManager::DatabaseManager(void)
 	}
 
 	{
-		String sql(L"create table if not exists Messages (id integer primary key, date integer, out integer, user_id integer, read_state integer, title varchar(255), body text, chat_id integer, admin_id integer)");
+		String sql(L"create table if not exists Messages (pk INTEGER PRIMARY KEY, id integer, date integer, out integer, user_id integer, read_state integer, title varchar(255), body text, chat_id integer, admin_id integer)");
 		result r = __pDatabase->ExecuteSql(sql, true);
 		if (IsFailed(r))
 		{
@@ -76,7 +76,7 @@ DatabaseManager::GetLastMessages(void)
 	pArrayList->Construct();
 
 	String sql("select ");
-	sql.Append("m.id, max(m.date), m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
+	sql.Append("m.pk, m.id, max(m.date), m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
 	sql.Append("from Messages as m ");
 	sql.Append("group by m.chat_id ");
 	sql.Append("order by m.date asc");
@@ -107,7 +107,7 @@ DatabaseManager::GetChatMessages(int chatId)
 	pArrayList->Construct();
 
 	String sql("select ");
-	sql.Append("m.id, m.date, m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
+	sql.Append("m.pk, m.id, m.date, m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
 	sql.Append("from Messages as m ");
 	sql.Append("where chat_id = ? ");
 	sql.Append("order by m.date asc");
@@ -201,6 +201,97 @@ DatabaseManager::GetUserById(Tizen::Base::LongLong userId)
 }
 
 void
+DatabaseManager::SaveMessage(Message* pMessage)
+{
+	result r;
+
+	String insertSql(L"insert into Messages ");
+	insertSql.Append(" (id, date, out, read_state, title, body, user_id, chat_id, admin_id) ");
+	insertSql.Append(" values ");
+	insertSql.Append(" (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+	DbStatement *pStmt = __pDatabase->CreateStatementN(insertSql);
+	pStmt->BindInt(0, pMessage->id.ToInt());					// message id
+	pStmt->BindInt64(1, pMessage->date.ToInt());					// message date
+	pStmt->BindInt(2, pMessage->isOut.ToInt());					// is it outgoing?
+	pStmt->BindInt(3, pMessage->readState.ToInt());				// is it read?
+	pStmt->BindString(4, pMessage->title);
+	pStmt->BindString(5, pMessage->body);
+	pStmt->BindInt(6, pMessage->userId.ToInt());
+	pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
+	pStmt->BindInt(8, pMessage->adminId.ToInt());
+
+	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+	AppAssert(!pEnum);
+
+	delete pEnum;
+	delete pStmt;
+}
+
+void
+DatabaseManager::UpdateMessage(Message* pMessage)
+{
+	if (pMessage->pk.ToInt() == 0)
+	{
+		AppLogDebug("trying to udpate message with pk=0");
+		return;
+	}
+
+	String updateSql(L"update Messages ");
+	updateSql.Append(L"set ");
+	updateSql.Append(L"id = ?, date = ?, out = ?, read_state = ?, title = ?, body = ?, user_id = ?, chat_id = ?, admin_id = ? ");
+	updateSql.Append(L"where pk = ?");
+
+	DbStatement *pStmt = __pDatabase->CreateStatementN(updateSql);
+	pStmt->BindInt(0, pMessage->id.ToInt());					// message id
+	pStmt->BindInt64(1, pMessage->date.ToInt());					// message date
+	pStmt->BindInt(2, pMessage->isOut.ToInt());					// is it outgoing?
+	pStmt->BindInt(3, pMessage->readState.ToInt());				// is it read?
+	pStmt->BindString(4, pMessage->title);
+	pStmt->BindString(5, pMessage->body);
+	pStmt->BindInt(6, pMessage->userId.ToInt());
+	pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
+	pStmt->BindInt(8, pMessage->adminId.ToInt());
+	pStmt->BindInt(9, pMessage->pk.ToInt());
+
+	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
+	AppAssert(!pEnum);
+	delete pEnum;
+	delete pStmt;
+}
+
+int
+DatabaseManager::PKForMessage(Message* pMessage)
+{
+	int pk = pMessage->pk.ToInt();
+	if (pk > 0)
+	{
+		return pk;
+	}
+
+	String searchSql("select pk from Messages where id = ?");
+
+	DbStatement* pSearchStmt = __pDatabase->CreateStatementN(searchSql);
+	result r = pSearchStmt->BindInt(0, pMessage->id.ToInt());
+	if (IsFailed(r)) {
+		AppLogDebug("failed to bind message id: %d", pMessage->id.ToInt());
+	}
+	else
+	{
+		DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pSearchStmt);
+		if (pEnum != null)
+		{
+			pEnum->MoveNext();
+			pEnum->GetIntAt(0, pk);
+		}
+		delete pEnum;
+	}
+	delete pSearchStmt;
+
+	return pk;
+}
+
+void
 DatabaseManager::SaveOrUpdateMessages(Tizen::Base::Collection::ArrayList* pMessageList)
 {
 	if (__pDatabase == null || pMessageList == null || pMessageList->GetCount() == 0)
@@ -208,39 +299,32 @@ DatabaseManager::SaveOrUpdateMessages(Tizen::Base::Collection::ArrayList* pMessa
 		return;
 	}
 
-	String sql(L"insert or replace into Messages ");
-	sql.Append(" (id, date, out, read_state, title, body, user_id, chat_id, admin_id) ");
-	sql.Append(" values ");
-	sql.Append(" (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-	__pDatabase->BeginTransaction();
-
-	DbStatement *pStmt = __pDatabase->CreateStatementN(sql);
+	__pDatabase-> BeginTransaction();
 
 	IEnumerator* pListEnum = pMessageList->GetEnumeratorN();
 	Message* pMessage = null;
 	while (pListEnum->MoveNext() == E_SUCCESS)
 	{
-	   pMessage = static_cast<Message*>(pListEnum->GetCurrent());
-		pStmt->BindInt(0, pMessage->id.ToInt());					// message id
-		pStmt->BindInt64(1, pMessage->date.ToInt());					// message date
-		pStmt->BindInt(2, pMessage->isOut.ToInt());					// is it outgoing?
-		pStmt->BindInt(3, pMessage->readState.ToInt());				// is it read?
-		pStmt->BindString(4, pMessage->title);
-		pStmt->BindString(5, pMessage->body);
-		pStmt->BindInt(6, pMessage->userId.ToInt());
-		pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
-		pStmt->BindInt(8, pMessage->adminId.ToInt());
+		pMessage = static_cast<Message*>(pListEnum->GetCurrent());
 
-		DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
-	    AppAssert(!pEnum);
-	    delete pEnum;
+		int pk = pMessage->pk.ToInt();
+		if (pk == 0)
+		{
+			pk = PKForMessage(pMessage);
+		}
+
+		if (pk > 0)
+		{
+			pMessage->pk = LongLong(pk);
+			UpdateMessage(pMessage);
+		}
+		else
+		{
+			SaveMessage(pMessage);
+		}
 	}
 
-	delete pListEnum;
-    delete pStmt;
-
-    __pDatabase-> CommitTransaction();
+	__pDatabase-> CommitTransaction();
 }
 
 //
@@ -254,30 +338,23 @@ DatabaseManager::SaveOrUpdateMessage(Message* pMessage)
 		return;
 	}
 
-	String sql(L"insert or replace into Messages ");
-	sql.Append(" (id, date, out, read_state, title, body, user_id, chat_id, admin_id) ");
-	sql.Append(" values ");
-	sql.Append(" (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
 	__pDatabase->BeginTransaction();
 
-	DbStatement *pStmt = __pDatabase->CreateStatementN(sql);
+	int pk = pMessage->pk.ToInt();
+	if (pk == 0)
+	{
+		pk = PKForMessage(pMessage);
+	}
 
-	pStmt->BindInt(0, pMessage->id.ToInt());					// message id
-	pStmt->BindInt64(1, pMessage->date.ToInt());					// message date
-	pStmt->BindInt(2, pMessage->isOut.ToInt());					// is it outgoing?
-	pStmt->BindInt(3, pMessage->readState.ToInt());				// is it read?
-	pStmt->BindString(4, pMessage->title);
-	pStmt->BindString(5, pMessage->body);
-	pStmt->BindInt(6, pMessage->userId.ToInt());
-	pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
-	pStmt->BindInt(8, pMessage->adminId.ToInt());
-
-	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
-    AppAssert(!pEnum);
-
-    delete pStmt;
-    delete pEnum;
+	if (pk > 0)
+	{
+		pMessage->pk = LongLong(pk);
+		UpdateMessage(pMessage);
+	}
+	else
+	{
+		SaveMessage(pMessage);
+	}
 
     __pDatabase-> CommitTransaction();
 }
@@ -334,30 +411,33 @@ DatabaseManager::GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum)
 	long long ll;
 	String s;
 
-	// 	sql.Append("m.id, max(m.date), m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
+	// 	sql.Append("m.pk, m.id, max(m.date), m.out, m.read_state, m.title, m.body, m.chat_id, m.user_id, m.admin_id ");
 
 	pEnum->GetIntAt(0, i);
+	pMessage->pk = LongLong(i);
+
+	pEnum->GetIntAt(1, i);
 	pMessage->id = LongLong(i);
 
-	pEnum->GetInt64At(1, ll);
+	pEnum->GetInt64At(2, ll);
 	pMessage->date = LongLong(ll);
 
-	pEnum->GetIntAt(2, i);
+	pEnum->GetIntAt(3, i);
 	pMessage->isOut = LongLong(i);
 
-	pEnum->GetIntAt(3, i);
+	pEnum->GetIntAt(4, i);
 	pMessage->readState = LongLong(i);
 
-	pEnum->GetStringAt(4, pMessage->title);
-	pEnum->GetStringAt(5, pMessage->body);
-
-	pEnum->GetIntAt(6, i);
-	pMessage->chatId = LongLong(i);
+	pEnum->GetStringAt(5, pMessage->title);
+	pEnum->GetStringAt(6, pMessage->body);
 
 	pEnum->GetIntAt(7, i);
-	pMessage->userId = LongLong(i);
+	pMessage->chatId = LongLong(i);
 
 	pEnum->GetIntAt(8, i);
+	pMessage->userId = LongLong(i);
+
+	pEnum->GetIntAt(9, i);
 	pMessage->adminId = LongLong(i);
 
 	return pMessage;

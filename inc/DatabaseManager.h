@@ -46,6 +46,10 @@ private:
 
     User* GetUserFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
     Message* GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
+
+    int PKForMessage(Message* pMessage);
+    void SaveMessage(Message* pMessage);
+    void UpdateMessage(Message* pMessage);
 };
 
 #endif /* DATABASEMANAGER_H_ */

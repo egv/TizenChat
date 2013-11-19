@@ -15,6 +15,7 @@
 class Message: public Tizen::Base::Object
 {
 public:
+	Tizen::Base::LongLong pk;
 	Tizen::Base::LongLong id;
 	Tizen::Base::LongLong userId;
 	Tizen::Base::LongLong date;

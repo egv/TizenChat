@@ -16,7 +16,8 @@ Message::Message() : attachments(SingleObjectDeleter)
                      , fwdMessages(SingleObjectDeleter)
 					 , chatActive(SingleObjectDeleter)
 {
-
+	pk = LongLong(0);
+	id = LongLong(0);
 }
 
 result
