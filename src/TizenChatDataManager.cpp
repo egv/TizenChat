@@ -74,7 +74,7 @@ TizenChatDataManager::LoadLongPollHistory()
 	String url(L"https://api.vk.com/method/messages.getLongPollHistory?max_msg_id=1&msgs_limit=200&ts=");
 	url.Append(__pLongPollServerData->ts.ToString());
 
-	result r = SendGetRequest(url, new Integer(GET_LONG_POLL_HISTORY_REQUEST_TAG));
+	result r = SendGetRequest(url, MakeTagForCode(GET_LONG_POLL_HISTORY_REQUEST_TAG));
 
 	if (r != E_SUCCESS)
 	{
@@ -95,7 +95,7 @@ TizenChatDataManager::LoadLastMessages()
 	getDialogsRequestRunning = true;
 	String url(L"https://api.vk.com/method/messages.getDialogs?count=200");
 
-	result r = SendGetRequest(url, new Integer(GET_DIALOGS_REQUEST_TAG));
+	result r = SendGetRequest(url, MakeTagForCode(GET_DIALOGS_REQUEST_TAG));
 
 	if (r != E_SUCCESS)
 	{
@@ -138,7 +138,7 @@ TizenChatDataManager::LoadChatHistory(int chatId, int offset, int count, int sta
 	url.Append(chatId < 0 ? -chatId : chatId + MAGIC_NUMBER);
 
 
-	result r = SendGetRequest(url, new Integer(MESSAGES_GET_HISTORY_TAG));
+	result r = SendGetRequest(url, MakeTagForCode(MESSAGES_GET_HISTORY_TAG));
 
 	if (r != E_SUCCESS)
 	{
@@ -157,7 +157,7 @@ TizenChatDataManager::ObtainLongPollServerData()
 	__getLongPollServerDataRequest = true;
 	String url(L"https://api.vk.com/method/messages.getLongPollServer");
 
-	result r = SendGetRequest(url, new Integer(GET_LONG_POLL_SERVER_DATA_REQUEST_TAG));
+	result r = SendGetRequest(url, MakeTagForCode(GET_LONG_POLL_SERVER_DATA_REQUEST_TAG));
 
 	if (r != E_SUCCESS)
 	{
@@ -177,7 +177,7 @@ TizenChatDataManager::LoadUsers(Tizen::Base::Collection::ArrayList* userIds)
 	url.Append(userIdsStr);
 	url.Append(L"&name_case=Nom&fields=screen_name,sex,online,photo_medium,photo_medium_rec");
 
-	result r = SendGetRequest(url, new Integer(USERS_GET_REQUEST_TAG));
+	result r = SendGetRequest(url, MakeTagForCode(USERS_GET_REQUEST_TAG));
 
 	if (r != E_SUCCESS)
 	{
@@ -196,7 +196,8 @@ TizenChatDataManager::GetLongPollServerData()
 void
 TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTransaction& httpTransaction, int availableBodyLen)
 {
-	Number *pOpCodeNumber = static_cast<Number*>(httpTransaction.GetUserObject());
+	HashMap *userObject = static_cast<HashMap*>(httpTransaction.GetUserObject());
+	Number* pOpCodeNumber = static_cast<Number*>(userObject->GetValue(String(L"tag")));
 	int opCode = pOpCodeNumber->ToInt();
 
 	switch (opCode)
@@ -679,3 +680,13 @@ TizenChatDataManager::ParseMessagesFromJsonPath(Tizen::Web::Json::JsonObject* pJ
 	return pArrayList;
 }
 
+Tizen::Base::Collection::HashMap*
+TizenChatDataManager::MakeTagForCode(int code)
+{
+	HashMap* result = new HashMap;
+	result->Construct();
+
+	result->Add(new String(L"tag"), new Integer(code));
+
+	return result;
+}

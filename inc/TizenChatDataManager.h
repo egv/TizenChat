@@ -89,6 +89,7 @@ private:
     //
     // util methods
     //
+    Tizen::Base::Collection::HashMap* MakeTagForCode(int code);
     bool CheckForError(Tizen::Web::Json::JsonObject* pJsonObject, Tizen::Base::LongLong& errorCode, Tizen::Base::String& errorMessage);
 
     //
