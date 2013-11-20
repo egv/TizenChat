@@ -360,6 +360,8 @@ TizenChatDataManager::NotifyError(Tizen::Base::LongLong errorCode, Tizen::Base::
 		return;
 	}
 
+	AppLogDebug("error %d: %S", errorCode.ToInt(), errorMessage.GetPointer());
+
 	IEnumerator* pEnum = __pListeners->GetEnumeratorN();
 	ITizenChatDataManagerEventsListener* pObj = null;
 	while (pEnum->MoveNext() == E_SUCCESS)
