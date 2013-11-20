@@ -396,10 +396,13 @@ DatabaseManager::GetUnknownUsers()
 				int i;
 				pEnum->GetIntAt(0, i);
 
-				LongLong* userId = new LongLong(i);
-				if (!pArrayList->Contains(*userId))
+				if (i > 0)
 				{
-					pArrayList->Add(userId);
+					LongLong* userId = new LongLong(i);
+					if (!pArrayList->Contains(*userId))
+					{
+						pArrayList->Add(userId);
+					}
 				}
 			}
 
