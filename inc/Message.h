@@ -23,7 +23,7 @@ public:
 	Tizen::Base::LongLong isOut;
 	Tizen::Base::String title;
 	Tizen::Base::String	body;
-	Tizen::Base::String	uuid;
+	Tizen::Base::LongLong uuid;
 	Tizen::Base::Collection::ArrayList attachments;
 	Tizen::Base::Collection::ArrayList fwdMessages;
 	Tizen::Base::LongLong hasEmoji;

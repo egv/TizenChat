@@ -22,6 +22,7 @@
 const static wchar_t* HTTP_CLIENT_HOST_ADDRESS = L"https://api.vk.com";
 
 using namespace Tizen::Base;
+using namespace Tizen::Base::Utility;
 using namespace Tizen::Base::Collection;
 using namespace Tizen::Net::Http;
 using namespace Tizen::Web::Json;
@@ -147,6 +148,46 @@ TizenChatDataManager::LoadChatHistory(int chatId, int offset, int count, int sta
 	}
 }
 
+void
+TizenChatDataManager::SendMessage(Message* pMessage)
+{
+	if (pMessage == null)
+	{
+		return;
+	}
+
+	String url(L"https://api.vk.com/method/messages.send?");
+	url.Append(L"guid=");
+	url.Append(pMessage->uuid.ToString());
+	url.Append(L"&");
+
+	if (pMessage->chatId.ToInt() < 0)
+	{
+		url.Append(L"type=0&user_id=");
+		url.Append(pMessage->userId.ToString());
+		url.Append(L"&");
+	}
+	else
+	{
+		url.Append(L"type=1&chat_id=");
+		url.Append(pMessage->chatId.ToString());
+		url.Append(L"&");
+	}
+
+	String encodedMessage;
+	UrlEncoder::Encode(pMessage->body, L"UTF-8", encodedMessage);
+	url.Append(L"message=");
+	url.Append(encodedMessage);
+
+	HashMap* tag = MakeTagForCode(MESSAGES_SEND_TAG);
+	tag->Add(new String(L"message"), pMessage);
+	result r = SendGetRequest(url, tag);
+
+	if (r != E_SUCCESS)
+	{
+		AppLogDebug("error sending request");
+	}
+}
 
 void
 TizenChatDataManager::ObtainLongPollServerData()
@@ -221,6 +262,10 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 		ParseUsersGetData(httpTransaction);
 		break;
 
+	case MESSAGES_SEND_TAG:
+		ParseSendMessageResult(httpTransaction);
+		break;
+
 	default:
 		AppLogDebug("unknown operation: %d", opCode);
 		break;
@@ -259,8 +304,6 @@ TizenChatDataManager::OnTransactionCertVerificationRequiredN(HttpSession& httpSe
 result
 TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag)
 {
-	AppLogDebug("request url: %S", url.GetPointer());
-
 	result r = E_SUCCESS;
 	HttpTransaction* pHttpTransaction = null;
 	HttpRequest* pHttpRequest = null;
@@ -298,6 +341,9 @@ TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Obje
 	}
 	correctUrl.Append(L"v=5.3&access_token=");
 	correctUrl.Append(*(Utils::getInstance().accessToken()));
+
+	AppLogDebug("request url: %S", correctUrl.GetPointer());
+
 
 	r = pHttpRequest->SetUri(correctUrl);
 	r = pHttpRequest->SetMethod(NET_HTTP_METHOD_GET);
@@ -678,6 +724,64 @@ TizenChatDataManager::ParseMessagesFromJsonPath(Tizen::Web::Json::JsonObject* pJ
 	}
 
 	return pArrayList;
+}
+
+void
+TizenChatDataManager::ParseSendMessageResult(HttpTransaction &httpTransaction)
+{
+	bool hasError;
+	LongLong errorCode;
+	String errorMessage;
+
+	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
+	// The GetHttpStatusCode() method is used to get the HTTP status from the response header.
+	// If the status code is HTTP_STATUS_OK, the transaction is a success.
+	AppLogDebug("http response status code: %d", pHttpResponse->GetHttpStatusCode());
+	if (pHttpResponse->GetHttpStatusCode() == HTTP_STATUS_OK)
+	{
+		HttpHeader* pHttpHeader = pHttpResponse->GetHeader();
+		// The GetRawHeaderN() method gets the HTTP header information from the response,
+		// while the ReadBodyN() method gets the content body information.
+		if (pHttpHeader != null)
+		{
+			ByteBuffer* pBuffer = pHttpResponse->ReadBodyN();
+
+			IJsonValue *pJsonValue = JsonParser::ParseN(*pBuffer);
+			if (pJsonValue->GetType() == JSON_TYPE_OBJECT)
+			{
+				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
+
+				hasError = CheckForError(pJsonObject, errorCode, errorMessage);
+				if (!hasError)
+				{
+					HashMap* tag = (HashMap*)httpTransaction.GetUserObject();
+					Message* pMessage = (Message*)tag->GetValue(String(L"message"));
+					Utils::getInstance().LongLongFromJsonObject(*pJsonObject, String(L"response"), true, pMessage->id);
+					AppLogDebug("got new message id: %d", pMessage->id.ToInt());
+					DatabaseManager::GetInstance().SaveOrUpdateMessage(pMessage);
+				}
+			}
+			delete pBuffer;
+			delete pJsonValue;
+		}
+	}
+
+	if (hasError)
+	{
+		NotifyError(errorCode, errorMessage);
+	}
+	else
+	{
+		ArrayList* pMissigUserIds = DatabaseManager::GetInstance().GetUnknownUsers();
+		if (pMissigUserIds->GetCount() > 0)
+		{
+			LoadUsers(pMissigUserIds);
+		}
+
+		delete pMissigUserIds;
+
+		NotifyMessagesUpdated();
+	}
 }
 
 Tizen::Base::Collection::HashMap*

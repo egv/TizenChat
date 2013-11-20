@@ -4,6 +4,7 @@
 
 #include <FBase.h>
 #include <FUi.h>
+#include <FSystem.h>
 
 #include "Utils.h"
 #include "TizenChatDataManager.h"
@@ -14,6 +15,7 @@
 using namespace Tizen::Base;
 using namespace Tizen::Base::Collection;
 using namespace Tizen::Ui;
+using namespace Tizen::System;
 using namespace Tizen::Graphics;
 using namespace Tizen::Ui::Controls;
 using namespace Tizen::Ui::Scenes;
@@ -195,6 +197,7 @@ ChatFormClass::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousScene
 	AppLogDebug("OnSceneActivatedN");
 	if (pArgs->GetCount())
 	{
+		__userId = 0;
 		Message* pMessage = (Message*) pArgs->GetAt(0);
 		__chatId = pMessage->chatId.ToInt();
 		AppLogDebug("need to show chat: %d", __chatId);
@@ -441,10 +444,33 @@ ChatFormClass::OnKeypadActionPerformed (Tizen::Ui::Control &source, Tizen::Ui::K
 	{
 		if (__pExpEditArea->GetText().GetLength() > 0)
 		{
-			String text = __pExpEditArea->GetText();
+			Message* pMessage = new Message;
+			pMessage->body = __pExpEditArea->GetText();
+			if (__chatId < 0)
+			{
+				pMessage->userId = LongLong(__userId);
+				pMessage->chatId = LongLong(__chatId);
+			}
+			else
+			{
+				pMessage->chatId = LongLong(__chatId);
+			}
+			long long time;
+			SystemTime::GetTicks(time);
+			pMessage->date = LongLong(time / 1000);
+			pMessage->uuid = LongLong(time / 1000);
+			pMessage->isOut = LongLong(1);
+
+			DatabaseManager::GetInstance().SaveOrUpdateMessage(pMessage);
+			int pk = DatabaseManager::GetInstance().PKForMessage(pMessage);
+			pMessage->pk = LongLong(pk);
+
+			TizenChatDataManager::GetInstance().SendMessage(pMessage);
+
 			__pExpEditArea->SetText(L"");
 			__pExpEditArea->Invalidate(true);
-			AppLogDebug("will send message: %S", text.GetPointer());
+
+			AppLogDebug("will send message: %S", pMessage->body.GetPointer());
 		}
 	}
 }

@@ -28,6 +28,7 @@ public:
     Tizen::Base::Collection::ArrayList* GetChatMessages(int chatId);
     void SaveOrUpdateMessage(Message* pMessage);
     void SaveOrUpdateMessages(Tizen::Base::Collection::ArrayList* pMessageList);
+    int PKForMessage(Message* pMessage);
 
     void SaveOrUpdateUser(User *pUser);
     User* GetUserById(Tizen::Base::LongLong userId);
@@ -47,7 +48,6 @@ private:
     User* GetUserFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
     Message* GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum);
 
-    int PKForMessage(Message* pMessage);
     void SaveMessage(Message* pMessage);
     void UpdateMessage(Message* pMessage);
 };

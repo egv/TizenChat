@@ -40,7 +40,7 @@ DatabaseManager::DatabaseManager(void)
 	}
 
 	{
-		String sql(L"create table if not exists Messages (pk INTEGER PRIMARY KEY, id integer, date integer, out integer, user_id integer, read_state integer, title varchar(255), body text, chat_id integer, admin_id integer, uuid varchar(100))");
+		String sql(L"create table if not exists Messages (pk INTEGER PRIMARY KEY, id integer, date integer, out integer, user_id integer, read_state integer, title varchar(255), body text, chat_id integer, admin_id integer, uuid integer)");
 		result r = __pDatabase->ExecuteSql(sql, true);
 		if (IsFailed(r))
 		{
@@ -220,7 +220,7 @@ DatabaseManager::SaveMessage(Message* pMessage)
 	pStmt->BindInt(6, pMessage->userId.ToInt());
 	pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
 	pStmt->BindInt(8, pMessage->adminId.ToInt());
-	pStmt->BindString(9, pMessage->uuid);
+	pStmt->BindInt(9, pMessage->uuid.ToInt());
 
 	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
 	AppAssert(!pEnum);
@@ -253,7 +253,7 @@ DatabaseManager::UpdateMessage(Message* pMessage)
 	pStmt->BindInt(6, pMessage->userId.ToInt());
 	pStmt->BindInt(7, pMessage->chatId.ToInt() == 0 ? -pMessage->userId.ToInt() : pMessage->chatId.ToInt());
 	pStmt->BindInt(8, pMessage->adminId.ToInt());
-	pStmt->BindString(9, pMessage->uuid);
+	pStmt->BindInt(9, pMessage->uuid.ToInt());
 	pStmt->BindInt(10, pMessage->pk.ToInt());
 
 	DbEnumerator* pEnum = __pDatabase->ExecuteStatementN(*pStmt);
@@ -271,12 +271,23 @@ DatabaseManager::PKForMessage(Message* pMessage)
 		return pk;
 	}
 
-	String searchSql("select pk from Messages where id = ?");
+	String searchSql;
+	int param;
+	if (pMessage->id.ToInt() > 0)
+	{
+		searchSql.Append("select pk from Messages where id = ?");
+		param = pMessage->id.ToInt();
+	}
+	else
+	{
+		searchSql.Append("select pk from Messages where uuid = ?");
+		param = pMessage->uuid.ToInt();
+	}
 
 	DbStatement* pSearchStmt = __pDatabase->CreateStatementN(searchSql);
-	result r = pSearchStmt->BindInt(0, pMessage->id.ToInt());
+	result r = pSearchStmt->BindInt(0, param);
 	if (IsFailed(r)) {
-		AppLogDebug("failed to bind message id: %d", pMessage->id.ToInt());
+		AppLogDebug("failed to bind message id:%d uuid: %d", pMessage->id.ToInt(), pMessage->uuid.ToInt());
 	}
 	else
 	{
@@ -442,7 +453,8 @@ DatabaseManager::GetMessageFromEnumerator(Tizen::Io::DbEnumerator* pEnum)
 	pEnum->GetIntAt(9, i);
 	pMessage->adminId = LongLong(i);
 
-	pEnum->GetStringAt(10, pMessage->uuid);
+	pEnum->GetIntAt(10, i);
+	pMessage->uuid = LongLong(i);
 
 	return pMessage;
 }

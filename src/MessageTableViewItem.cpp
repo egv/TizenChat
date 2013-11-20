@@ -42,12 +42,8 @@ MessageTableViewItem::FillWithMessage(Message* pMessage)
 		}
 
 		__pEnrichedText = MessageTableViewItem::GetEnrichedTextForMessage(pMessage, GetSize().width);
-//		Dimension extent;
-//		int actualLength;
-//		__pEnrichedText->GetTextExtent(0, __pEnrichedText->GetTextLength(), extent, actualLength);
-//		AppLogDebug("w: %d, h: %d, ew: %d, eh: %d, l: %d, al: %d, text: %S", __pEnrichedText->GetWidth(), __pEnrichedText->GetTotalLineHeight(), extent.width, extent.height, __pEnrichedText->GetTextLength(), actualLength, pMessage->body.GetPointer());
-		__bIsOut = pMessage->isOut.ToInt() > 0;
-		__isMultichat = pMessage->chatId.ToInt() > 0;
+		__bIsOut = (pMessage->isOut.ToInt() > 0);
+		__isMultichat = (pMessage->chatId.ToInt() > 0);
 	}
 }
 
