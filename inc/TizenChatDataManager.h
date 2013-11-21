@@ -34,6 +34,7 @@ public:
 
     // data-related methods
     void LoadLastMessages();
+    void LoadMessagesByIds(Tizen::Base::Collection::ArrayList* messageIds);
     void LoadLongPollHistory();
     void LoadChatHistory(int chatId, int offset=0, int count=200, int startMessageId = 0, int rev = 0);
     void SendMessage(Message* pMessage);
@@ -44,6 +45,7 @@ public:
     // long poll server data
     void ObtainLongPollServerData();
     LongPollServerData* GetLongPollServerData();
+    void StartLongPolling();
 
 
     // HttpTransactionListener methods
@@ -63,10 +65,13 @@ private:
 	static const int USERS_GET_REQUEST_TAG = 103;
 	static const int MESSAGES_GET_HISTORY_TAG = 104;
 	static const int MESSAGES_SEND_TAG = 105;
+	static const int LONG_POLL_REQUEST_TAG = 106;
+	static const int MESSAGES_GET_BY_IDS_TAG = 107;
 
 
 	LongPollServerData* __pLongPollServerData;
 	Tizen::Net::Http::HttpSession* __pHttpSession;
+	Tizen::Net::Http::HttpSession* __pLongPollHttpSession;
     Tizen::Base::Collection::ArrayList* __pListeners;
 
     bool getDialogsRequestRunning;
@@ -87,6 +92,7 @@ private:
     ~TizenChatDataManager();
 
     result SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag);
+    result SendGetRequest(HttpSession*& pHttpSession, Tizen::Base::String& url, bool addToken, Tizen::Base::Object* tag);
 
     //
     // util methods
@@ -110,6 +116,8 @@ private:
     void ParseLongPollHistory(HttpTransaction &httpTransaction);
     void ParseMessages(HttpTransaction& httpTransaction);
     void ParseUser();
+
+    void ParseLongPollingResult(HttpTransaction& httpTransaction);
 
     Tizen::Base::Collection::ArrayList* ParseMessagesFromJsonPath(Tizen::Web::Json::JsonObject* pJsonObject, Tizen::Base::String path);
 };

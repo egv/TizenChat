@@ -40,6 +40,9 @@ class Utils
         result StringFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::String &out);
         result LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, const Tizen::Base::String& key, bool mandatory, Tizen::Base::Collection::ArrayList &out);
 
+        result GetStringFromJsonArrayAt(Tizen::Web::Json::JsonArray* pJsonArray, int pos, Tizen::Base::String& out);
+        result GetLongLongFromJsonArrayAt(Tizen::Web::Json::JsonArray* pJsonArray, int pos, Tizen::Base::LongLong& out);
+
         Tizen::Graphics::Bitmap* GetBitmapWithName(String name);
         Tizen::Graphics::Bitmap* MaskBitmap(Tizen::Graphics::Bitmap* pBitmap, String maskName, int width, int height);
 

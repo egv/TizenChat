@@ -32,6 +32,36 @@ TizenChatDataManager::~TizenChatDataManager()
 	DELETE_NON_NULL(__pHttpSession);
 }
 
+/*
+ * 0,$message_id,0 -- удаление сообщения с указанным local_id
+1,$message_id,$flags -- замена флагов сообщения (FLAGS:=$flags)
+2,$message_id,$mask[,$user_id] -- установка флагов сообщения (FLAGS|=$mask)
+3,$message_id,$mask[,$user_id] -- сброс флагов сообщения (FLAGS&=~$mask)
+4,$message_id,$flags,$from_id,$timestamp,$subject,$text,$attachments -- добавление нового сообщения
+8,-$user_id,$extra-- друг $user_id стал онлайн, $extra не равен 0, если в mode был передан флаг 64, в младшем байте (остаток от деления на 256) числа $extra лежит идентификатор платформы (таблица ниже)
+9,-$user_id,$flags -- друг $user_id стал оффлайн ($flags равен 0, если пользователь покинул сайт (например, нажал выход) и 1, если оффлайн по таймауту (например, статус away))
+
+51,$chat_id,$self -- один из параметров (состав, тема) беседы $chat_id были изменены. $self - были ли изменения вызваны самим пользователем
+61,$user_id,$flags -- пользователь $user_id начал набирать текст в диалоге. событие должно приходить раз в ~5 секунд при постоянном наборе текста. $flags = 1
+62,$user_id,$chat_id -- пользователь $user_id начал набирать текст в беседе $chat_id.
+70,$user_id,$call_id -- пользователь $user_id совершил звонок имеющий идентификатор $call_id, дополнительную информацию о звонке можно получить используя метод voip.getCallInfo.
+ *
+ */
+enum
+{
+	EVENT_TYPE_MESSAGE_DELETED = 0,
+	EVENT_TYPE_MESSAGE_FLAGS_CHANGED = 1,
+	EVENT_TYPE_MESSAGE_FLAGS_SET = 2,
+	EVENT_TYPE_MESSAGE_FLAGS_RESET = 3,
+	EVENT_TYPE_NEW_MESSAGE = 4,
+	EVENT_TYPE_FRIEND_BECAME_ONLINE = 8,
+	EVENT_TYPE_FRIEND_BECAME_OFFLINE = 9,
+	EVENT_TYPE_CHAT_PARAMS_CHANGED = 51,
+	EVENT_TYPE_USER_TYPING_IN_DIALOG = 61,
+	EVENT_TYPE_USER_TYPING_IN_CHAT = 62,
+	EVENT_TYPE_USER_MADE_VIDEO_CALL = 70
+};
+
 void
 TizenChatDataManager::AddDataManagerEventsListener(const ITizenChatDataManagerEventsListener& listener)
 {
@@ -104,6 +134,26 @@ TizenChatDataManager::LoadLastMessages()
 		getDialogsRequestRunning = false;
 	}
 }
+
+void
+TizenChatDataManager::LoadMessagesByIds(Tizen::Base::Collection::ArrayList* messageIds)
+{
+	String url(L"https://api.vk.com/method/messages.getById?message_ids=");
+
+	String messageIdsStr;
+	Utils::getInstance().JoinNumbersArrayList(messageIds, messageIdsStr);
+
+	url.Append(messageIdsStr);
+
+	result r = SendGetRequest(url, MakeTagForCode(MESSAGES_GET_BY_IDS_TAG));
+
+	if (r != E_SUCCESS)
+	{
+		AppLogDebug("error sending request to get users");
+	}
+
+}
+
 
 void
 TizenChatDataManager::LoadChatHistory(int chatId, int offset, int count, int startMessageId, int rev)
@@ -208,6 +258,24 @@ TizenChatDataManager::ObtainLongPollServerData()
 }
 
 void
+TizenChatDataManager::StartLongPolling(void)
+{
+	if (__pLongPollServerData == null)
+	{
+		return;
+	}
+
+	String url;
+	url.Format(1024,
+			L"http://%ls?act=a_check&key=%ls&ts=%d&mode=0&wait=25",
+			__pLongPollServerData->server.GetPointer(),
+			__pLongPollServerData->key.GetPointer(),
+			__pLongPollServerData->ts.ToInt());
+
+	SendGetRequest(__pLongPollHttpSession, url, false, MakeTagForCode(LONG_POLL_REQUEST_TAG));
+}
+
+void
 TizenChatDataManager::LoadUsers(Tizen::Base::Collection::ArrayList* userIds)
 {
 	String url(L"https://api.vk.com/method/users.get?user_ids=");
@@ -245,6 +313,7 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 	{
 	case GET_DIALOGS_REQUEST_TAG:
 	case MESSAGES_GET_HISTORY_TAG:
+	case MESSAGES_GET_BY_IDS_TAG:
 		AppLogDebug("will parse messages");
 		ParseMessages(httpTransaction);
 		break;
@@ -264,6 +333,10 @@ TizenChatDataManager::OnTransactionReadyToRead(HttpSession& httpSession, HttpTra
 
 	case MESSAGES_SEND_TAG:
 		ParseSendMessageResult(httpTransaction);
+		break;
+
+	case LONG_POLL_REQUEST_TAG:
+		ParseLongPollingResult(httpTransaction);
 		break;
 
 	default:
@@ -302,28 +375,28 @@ TizenChatDataManager::OnTransactionCertVerificationRequiredN(HttpSession& httpSe
 }
 
 result
-TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag)
+TizenChatDataManager::SendGetRequest(HttpSession*& pHttpSession, Tizen::Base::String& url, bool addToken, Tizen::Base::Object* tag)
 {
 	result r = E_SUCCESS;
 	HttpTransaction* pHttpTransaction = null;
 	HttpRequest* pHttpRequest = null;
 
-	if (__pHttpSession == null)
+	if (pHttpSession == null)
 	{
-		__pHttpSession = new (std::nothrow) HttpSession();
+		pHttpSession = new (std::nothrow) HttpSession();
 
-		r = __pHttpSession->Construct(NET_HTTP_SESSION_MODE_NORMAL,
+		r = pHttpSession->Construct(NET_HTTP_SESSION_MODE_NORMAL,
 				null,
 				HTTP_CLIENT_HOST_ADDRESS,
 				null);
 	}
 	else
 	{
-		__pHttpSession->CloseAllTransactions();
+		pHttpSession->CloseAllTransactions();
 		AppLogDebug("http session is not null, but it should be");
 	}
 
-	pHttpTransaction = __pHttpSession->OpenTransactionN();
+	pHttpTransaction = pHttpSession->OpenTransactionN();
 	r = pHttpTransaction->AddHttpTransactionListener(*this);
 
 	pHttpRequest = const_cast<HttpRequest*>(pHttpTransaction->GetRequest());
@@ -331,16 +404,20 @@ TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Obje
 	pHttpTransaction->SetUserObject(tag);
 
 	String correctUrl(url);
-	if (correctUrl.Contains(L"?"))
+
+	if (addToken)
 	{
-		correctUrl.Append(L"&");
+		if (correctUrl.Contains(L"?"))
+		{
+			correctUrl.Append(L"&");
+		}
+		else
+		{
+			correctUrl.Append(L"?");
+		}
+		correctUrl.Append(L"v=5.3&access_token=");
+		correctUrl.Append(*(Utils::getInstance().accessToken()));
 	}
-	else
-	{
-		correctUrl.Append(L"?");
-	}
-	correctUrl.Append(L"v=5.3&access_token=");
-	correctUrl.Append(*(Utils::getInstance().accessToken()));
 
 	AppLogDebug("request url: %S", correctUrl.GetPointer());
 
@@ -350,6 +427,13 @@ TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Obje
 	r = pHttpTransaction->Submit();
 
 	return r;
+
+}
+
+result
+TizenChatDataManager::SendGetRequest(Tizen::Base::String& url, Tizen::Base::Object* tag)
+{
+	return SendGetRequest(__pHttpSession, url, true, tag);
 }
 
 void
@@ -461,6 +545,20 @@ TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
 						delete __pLongPollServerData;
 						__pLongPollServerData = null;
 					}
+					else
+					{
+						__pLongPollServerData->LogDebug();
+						if (__pLongPollHttpSession != null)
+						{
+							delete __pLongPollHttpSession;
+						}
+						__pLongPollHttpSession = new (std::nothrow) HttpSession;
+						r = __pLongPollHttpSession->Construct(NET_HTTP_SESSION_MODE_NORMAL,
+								null,
+								__pLongPollServerData->server,
+								null);
+
+					}
 				}
 			}
 
@@ -476,6 +574,7 @@ TizenChatDataManager::ParseLongPollServerData(HttpTransaction &httpTransaction)
 	else
 	{
 		NotifyLongPollServerDataUpdated();
+		StartLongPolling();
 	}
 }
 
@@ -784,6 +883,108 @@ TizenChatDataManager::ParseSendMessageResult(HttpTransaction &httpTransaction)
 
 		NotifyMessagesUpdated();
 	}
+}
+
+void
+TizenChatDataManager::ParseLongPollingResult(HttpTransaction& httpTransaction)
+{
+	bool hasError;
+	ByteBuffer* pBuffer;
+	IJsonValue *pJsonValue;
+
+	HttpResponse* pHttpResponse = httpTransaction.GetResponse();
+	if (pHttpResponse->GetHttpStatusCode() == HTTP_STATUS_OK)
+	{
+		HttpHeader* pHttpHeader = pHttpResponse->GetHeader();
+		// The GetRawHeaderN() method gets the HTTP header information from the response,
+		// while the ReadBodyN() method gets the content body information.
+		if (pHttpHeader != null)
+		{
+			pBuffer = pHttpResponse->ReadBodyN();
+			pJsonValue = JsonParser::ParseN(*pBuffer);
+
+			if (pJsonValue->GetType() == JSON_TYPE_OBJECT)
+			{
+				JsonObject *pJsonObject = static_cast<JsonObject*>(pJsonValue);
+
+				pJsonObject->ContainsKey(new String(L"failure"), hasError);
+				if (!hasError)
+				{
+					Utils::getInstance().LongLongFromJsonObject(*pJsonObject, String(L"ts"), true, __pLongPollServerData->ts);
+
+					IJsonValue *pUpdatesArrayValue = null;
+					pJsonObject->GetValue(new String(L"updates"), pUpdatesArrayValue);
+					JsonArray* pUpdatesArray = static_cast<JsonArray*>(pUpdatesArrayValue);
+
+	                ArrayList* pMessageIds = new (std::nothrow) ArrayList;
+	                pMessageIds->Construct();
+
+			        IEnumeratorT<IJsonValue*>* pEnum = pUpdatesArray->GetEnumeratorN();
+			        if(pEnum)
+			        {
+			        	IJsonValue *pInternalJsonValue = null;
+			            while( pEnum->MoveNext() == E_SUCCESS )
+			            {
+			                //Uses the pJsonValue
+			                pEnum->GetCurrent(pInternalJsonValue);
+			                TryCatch(pInternalJsonValue->GetType() == JSON_TYPE_ARRAY, delete pEnum, "wrong array content");
+
+			                JsonArray *pJsonUpdateArray = static_cast<JsonArray*>(pInternalJsonValue);
+			                LongLong eventType;
+			                result r = Utils::getInstance().GetLongLongFromJsonArrayAt(pJsonUpdateArray, 0, eventType);
+			                if (!IsFailed(r))
+			                {
+			                	switch (eventType.ToInt())
+			                	{
+			                	case EVENT_TYPE_NEW_MESSAGE:
+			                	{
+			                		LongLong messageId;
+			                		result rr = Utils::getInstance().GetLongLongFromJsonArrayAt(pJsonUpdateArray, 1, messageId);
+			                		if (!IsFailed(rr))
+			                		{
+			                			pMessageIds->Add(new LongLong(messageId));
+			                			AppLogDebug("new message id: %d", messageId.ToInt());
+			                		}
+			                	}
+			                	break;
+
+			                	default:
+			                		break;
+			                	}
+			                }
+			            }
+			            delete pEnum;
+			        }
+
+			        if (pMessageIds->GetCount() > 0)
+			        {
+			        	LoadMessagesByIds(pMessageIds);
+			        }
+
+			        delete pMessageIds;
+				}
+			}
+			delete pBuffer;
+			delete pJsonValue;
+		}
+	}
+
+
+	if (hasError)
+	{
+		ObtainLongPollServerData();
+	}
+	else
+	{
+		StartLongPolling();
+	}
+
+	return;
+
+CATCH:
+	delete pBuffer;
+	delete pJsonValue;
+	StartLongPolling();
 }
 
 Tizen::Base::Collection::HashMap*

@@ -23,6 +23,7 @@ public:
 	LongPollServerData();
 
 	result FillWithJsonObject(const Tizen::Web::Json::JsonObject& object);
+	void LogDebug();
 };
 
 #endif /* LONGPOLLSERVERDATA_H_ */

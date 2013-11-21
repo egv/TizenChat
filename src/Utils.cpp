@@ -159,11 +159,11 @@ Utils::LongLongArrayFromJsonObject(const Tizen::Web::Json::JsonObject& object, c
 	// check if there is such a key
 	bool hasKey;
 	r = object.ContainsKey(&key, hasKey);
-	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "%s: turned to invalid arg", key.GetPointer());
+	TryReturn(r == E_SUCCESS, E_INVALID_ARG, "%S: turned to invalid arg", key.GetPointer());
 
 	if (mandatory && !hasKey)
 	{
-		TryReturn(hasKey, E_INVALID_ARG, "no key %s in object", key.GetPointer());
+		TryReturn(hasKey, E_INVALID_ARG, "no key %S in object", key.GetPointer());
 	}
 
 	if (hasKey)
@@ -308,3 +308,41 @@ Utils::MaskBitmap(Tizen::Graphics::Bitmap* pBitmap, String maskName, int width, 
 	return __pBitmap;
 }
 
+
+result
+Utils::GetStringFromJsonArrayAt(Tizen::Web::Json::JsonArray* pJsonArray, int pos, Tizen::Base::String& out)
+{
+	result r;
+
+	TryReturn(pJsonArray != null, E_INVALID_ARG, "array is null");
+	TryReturn(pos < pJsonArray->GetCount(), E_INVALID_ARG, "Position is too big. pos: %d, count: %d", pos, pJsonArray->GetCount());
+
+	IJsonValue* pJsonValue = 0;
+	r = pJsonArray->GetAt(pos, pJsonValue);
+	TryReturn(r == E_SUCCESS, r, "error getting item at position %d", pos);
+	TryReturn(pJsonValue->GetType() == JSON_TYPE_STRING, E_INVALID_ARG, "wrong element type");
+	JsonString* pJsonString = static_cast<JsonString*>(pJsonValue);
+
+	out = String(*pJsonString);
+
+	return r;
+}
+
+result
+Utils::GetLongLongFromJsonArrayAt(Tizen::Web::Json::JsonArray* pJsonArray, int pos, Tizen::Base::LongLong& out)
+{
+	result r;
+
+	TryReturn(pJsonArray != null, E_INVALID_ARG, "array is null");
+	TryReturn(pos < pJsonArray->GetCount(), E_INVALID_ARG, "Position is too big. pos: %d, count: %d", pos, pJsonArray->GetCount());
+
+	IJsonValue* pJsonValue = 0;
+	r = pJsonArray->GetAt(pos, pJsonValue);
+	TryReturn(r == E_SUCCESS, r, "error getting item at position %d", pos);
+	TryReturn(pJsonValue->GetType() == JSON_TYPE_NUMBER, E_INVALID_ARG, "wrong element type");
+	JsonNumber* pJsonNumber = static_cast<JsonNumber*>(pJsonValue);
+
+	out = LongLong(pJsonNumber->ToLongLong());
+
+	return r;
+}
