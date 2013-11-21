@@ -138,7 +138,8 @@ MessageTableViewItem::GetEnrichedTextForMessage(Message* pMessage, int itemWidth
 	pEnrichedText->SetTextAbbreviationEnabled(true);
 
 	TextElement* pTextElement = new TextElement;
-	pTextElement->Construct(pMessage->body);
+	String txt = pMessage->body.GetLength() == 0 ? String(L"no message") : pMessage->body;
+	pTextElement->Construct(txt);
 	{
 		Font font;
 		font.Construct(FONT_STYLE_PLAIN, 35);
